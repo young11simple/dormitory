@@ -1,4 +1,6 @@
 import { asyncRouterMap, constantRouterMap } from '@/config/router.config'
+import Vue from 'vue'
+import { ROLE_ID } from '@/store/mutation-types'
 
 /**
  * 过滤账户是否拥有某一个权限，并将菜单从加载列表移除
@@ -7,19 +9,19 @@ import { asyncRouterMap, constantRouterMap } from '@/config/router.config'
  * @param route
  * @returns {boolean}
  */
-function hasPermission (permission, route) {
-  if (route.meta && route.meta.permission) {
-    let flag = false
-    for (let i = 0, len = permission.length; i < len; i++) {
-      flag = route.meta.permission.includes(permission[i])
-      if (flag) {
-        return true
-      }
-    }
-    return false
-  }
-  return true
-}
+// function hasPermission (permission, route) {
+//   if (route.meta && route.meta.permission) {
+//     let flag = false
+//     for (let i = 0, len = permission.length; i < len; i++) {
+//       flag = route.meta.permission.includes(permission[i])
+//       if (flag) {
+//         return true
+//       }
+//     }
+//     return false
+//   }
+//   return true
+// }
 
 /**
  * 单账户多角色时，使用该方法可过滤角色不存在的菜单
@@ -31,6 +33,15 @@ function hasPermission (permission, route) {
 // eslint-disable-next-line
 function hasRole(roles, route) {
   if (route.meta && route.meta.roles) {
+    console.log('roles.id', roles.id)
+    if (Vue.ls.get(ROLE_ID) === 'admin') {
+      roles.id = 'admin'
+    } else if (Vue.ls.get(ROLE_ID) === 'student') {
+      roles.id = 'student'
+    } else {
+      roles.id = 'others'
+    }
+    console.log('roles.id', roles.id)
     return route.meta.roles.includes(roles.id)
   } else {
     return true
@@ -39,7 +50,8 @@ function hasRole(roles, route) {
 
 function filterAsyncRouter (routerMap, roles) {
   const accessedRouters = routerMap.filter(route => {
-    if (hasPermission(roles.permissionList, route)) {
+    // if (hasPermission(roles.permissionList, route)) {
+    if (hasRole(roles, route)) {
       if (route.children && route.children.length) {
         route.children = filterAsyncRouter(route.children, roles)
       }

@@ -7,5 +7,8 @@
  * 所有图标均从这里加载，方便管理
  */
 import bxAnaalyse from '@/assets/icons/bx-analyse.svg?inline' // path to your '*.svg?inline' file.
+import dormManage from '@/assets/icons/dormManage.svg?inline'
+import dormPay from '@/assets/icons/pay.svg?inline'
+import dormReg from '@/assets/icons/reg.svg?inline'
 
-export { bxAnaalyse }
+export { bxAnaalyse, dormManage, dormPay, dormReg }
