@@ -10,5 +10,6 @@ import bxAnaalyse from '@/assets/icons/bx-analyse.svg?inline' // path to your '*
 import dormManage from '@/assets/icons/dormManage.svg?inline'
 import dormPay from '@/assets/icons/pay.svg?inline'
 import dormReg from '@/assets/icons/reg.svg?inline'
+import stuInfo from '@/assets/icons/studentInfo.svg?inline'
 
-export { bxAnaalyse, dormManage, dormPay, dormReg }
+export { bxAnaalyse, dormManage, dormPay, dormReg, stuInfo }

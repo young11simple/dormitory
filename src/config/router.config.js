@@ -1,6 +1,6 @@
 // eslint-disable-next-line
 import { UserLayout, BasicLayout, RouteView, BlankLayout, PageView } from '@/layouts'
-import { dormManage, dormPay } from '@/core/icons'
+import { dormManage, dormPay, stuInfo } from '@/core/icons'
 
 export const adminRouterMap = [
   {
@@ -10,37 +10,59 @@ export const adminRouterMap = [
     meta: { title: '首页' },
     redirect: '/pay/payTotal',
     children: [
+      // student
+      {
+        path: '/studentInfo',
+        name: 'studentInfo',
+        redirect: '/studentInfo/search',
+        component: RouteView,
+        meta: { title: '学生信息', keepAlive: true, icon: stuInfo },
+        children: [
+          {
+            path: '/studentInfo/search',
+            name: 'search',
+            component: () => import('@/views/dashboard/Analysis'),
+            meta: { title: '查看学生信息', keepAlive: false }
+          },
+          {
+            path: '/studentInfo/update',
+            name: 'search',
+            component: () => import('@/views/dashboard/Analysis'),
+            meta: { title: '更新学生信息', keepAlive: false }
+          }
+        ]
+      },
       // pay
       {
         path: '/pay',
         name: 'pay',
         redirect: '/pay/payTotal',
         component: RouteView,
-        meta: { title: '宿舍缴费', keepAlive: true, icon: dormPay, permission: ['pay'], roles: ['admin'] },
+        meta: { title: '宿舍用电', keepAlive: true, icon: dormPay, permission: ['pay'] },
         children: [
           {
             path: '/pay/payTotal',
             name: 'payTotal',
             component: () => import('@/views/dashboard/Analysis'),
-            meta: { title: '宿舍缴费信息', keepAlive: false, permission: ['pay'], roles: ['admin'] }
+            meta: { title: '缴费信息', keepAlive: false, permission: ['pay'] }
           },
           {
             path: '/pay/eleTotal',
             name: 'eleTotal',
             component: () => import('@/views/dashboard/Analysis'),
-            meta: { title: '宿舍用电信息', keepAlive: false, permission: ['pay'], roles: ['admin'] }
+            meta: { title: '用电信息', keepAlive: false, permission: ['pay'] }
           },
           {
             path: '/pay/noPayTotal',
             name: 'noPayTotal',
             component: () => import('@/views/dashboard/Analysis'),
-            meta: { title: '未缴费通知', keepAlive: false, permission: ['pay'], roles: ['student'] }
+            meta: { title: '未缴费通知', keepAlive: false, permission: ['pay'] }
           },
           {
             path: '/pay/elePreTotal',
             name: 'elePreTotal',
             component: () => import('@/views/dashboard/Analysis'),
-            meta: { title: '用电预警通知', keepAlive: false, permission: ['pay'], roles: ['student'] }
+            meta: { title: '用电预警通知', keepAlive: false, permission: ['pay'] }
           }
         ]
       },
@@ -50,37 +72,37 @@ export const adminRouterMap = [
         name: 'dashboard',
         redirect: '/dashboard/workplace',
         component: RouteView,
-        meta: { title: '宿舍管理', keepAlive: true, icon: dormManage, permission: ['dashboard'], roles: ['admin'] },
+        meta: { title: '宿舍管理', keepAlive: true, icon: dormManage, permission: ['dashboard'] },
         children: [
           {
             path: '/dashboard/analysis',
             name: 'Analysis',
             component: () => import('@/views/dashboard/Analysis'),
-            meta: { title: '宿舍信息添加', keepAlive: false, permission: ['dashboard'], roles: ['admin'] }
+            meta: { title: '宿舍信息添加', keepAlive: false, permission: ['dashboard'] }
           },
           {
             path: '/dashboard/workplace',
             name: 'Workplace',
             component: () => import('@/views/dashboard/Workplace'),
-            meta: { title: '宿舍信息查看', keepAlive: true, permission: ['dashboard'], roles: ['student'] }
+            meta: { title: '宿舍信息查看', keepAlive: true, permission: ['dashboard'] }
           },
           {
             path: '/dashboard/test-work',
             name: 'TestWork',
             component: () => import('@/views/dashboard/TestWork'),
-            meta: { title: '宿舍信息删除', keepAlive: true, permission: ['dashboard'], roles: ['admin'] }
+            meta: { title: '宿舍信息删除', keepAlive: true, permission: ['dashboard'] }
           },
           {
             path: '/dashboard/test-work',
             name: 'TestWork',
             component: () => import('@/views/dashboard/TestWork'),
-            meta: { title: '随机分配宿舍', keepAlive: true, permission: ['dashboard'], roles: ['admin'] }
+            meta: { title: '随机分配宿舍', keepAlive: true, permission: ['dashboard'] }
           },
           {
             path: '/dorm/test-work',
             name: 'TestWork',
             component: () => import('@/views/dashboard/TestWork'),
-            meta: { title: '人工分配宿舍', keepAlive: true, permission: ['dashboard'], roles: ['student'] }
+            meta: { title: '人工分配宿舍', keepAlive: true, permission: ['dashboard'] }
           }
         ]
       },
@@ -90,7 +112,7 @@ export const adminRouterMap = [
         component: RouteView,
         redirect: '/account/center',
         name: 'account',
-        meta: { title: '个人页', icon: 'user', keepAlive: true, permission: ['user'] },
+        meta: { title: '个人信息', icon: 'user', keepAlive: true, permission: ['user'] },
         children: [
           {
             path: '/account/center',
@@ -171,6 +193,62 @@ export const studentRouterMap = [
             name: 'eleTotal',
             component: () => import('@/views/dashboard/Analysis'),
             meta: { title: '宿舍用电信息', keepAlive: false, permission: ['pay'] }
+          }
+        ]
+      },
+      // account
+      {
+        path: '/account',
+        component: RouteView,
+        redirect: '/account/center',
+        name: 'account',
+        meta: { title: '个人页', icon: 'user', keepAlive: true, permission: ['user'] },
+        children: [
+          {
+            path: '/account/center',
+            name: 'center',
+            component: () => import('@/views/account/center/Index'),
+            meta: { title: '个人中心', keepAlive: true, permission: ['user'] }
+          },
+          {
+            path: '/account/settings',
+            name: 'settings',
+            component: () => import('@/views/account/settings/Index'),
+            meta: { title: '个人设置', hideHeader: true, permission: ['user'] },
+            redirect: '/account/settings/base',
+            hideChildrenInMenu: true,
+            children: [
+              {
+                path: '/account/settings/base',
+                name: 'BaseSettings',
+                component: () => import('@/views/account/settings/BaseSetting'),
+                meta: { title: '基本设置', permission: ['user'] }
+              },
+              {
+                path: '/account/settings/security',
+                name: 'SecuritySettings',
+                component: () => import('@/views/account/settings/Security'),
+                meta: { title: '安全设置', keepAlive: true, permission: ['user'] }
+              },
+              {
+                path: '/account/settings/custom',
+                name: 'CustomSettings',
+                component: () => import('@/views/account/settings/Custom'),
+                meta: { title: '个性化设置', keepAlive: true, permission: ['user'] }
+              },
+              {
+                path: '/account/settings/binding',
+                name: 'BindingSettings',
+                component: () => import('@/views/account/settings/Binding'),
+                meta: { title: '账户绑定', keepAlive: true, permission: ['user'] }
+              },
+              {
+                path: '/account/settings/notification',
+                name: 'NotificationSettings',
+                component: () => import('@/views/account/settings/Notification'),
+                meta: { title: '新消息通知', keepAlive: true, permission: ['user'] }
+              }
+            ]
           }
         ]
       }
