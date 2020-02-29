@@ -66,43 +66,25 @@ export const adminRouterMap = [
           }
         ]
       },
-      // dashboard
+      // management
       {
-        path: '/dashboard',
-        name: 'dashboard',
-        redirect: '/dashboard/workplace',
+        path: '/management',
+        name: 'management',
+        redirect: '/management/workplace',
         component: RouteView,
-        meta: { title: '宿舍管理', keepAlive: true, icon: 'home', permission: ['dashboard'] },
+        meta: { title: '宿舍管理', keepAlive: true, icon: 'home' },
         children: [
           {
-            path: '/dashboard/analysis',
-            name: 'Analysis',
-            component: () => import('@/views/dashboard/Analysis'),
-            meta: { title: '宿舍信息添加', keepAlive: false, permission: ['dashboard'] }
-          },
-          {
-            path: '/dashboard/workplace',
-            name: 'Workplace',
-            component: () => import('@/views/dashboard/Workplace'),
-            meta: { title: '宿舍信息查看', keepAlive: true, permission: ['dashboard'] }
-          },
-          {
-            path: '/dashboard/test-work',
-            name: 'TestWork',
-            component: () => import('@/views/dashboard/TestWork'),
-            meta: { title: '宿舍信息删除', keepAlive: true, permission: ['dashboard'] }
-          },
-          {
-            path: '/dashboard/test-work',
-            name: 'TestWork',
-            component: () => import('@/views/dashboard/TestWork'),
-            meta: { title: '随机分配宿舍', keepAlive: true, permission: ['dashboard'] }
+            path: '/dashboard/dormInfo',
+            name: 'dormInfo',
+            component: () => import('@/views/management/dormInfo'),
+            meta: { title: '宿舍信息', keepAlive: true }
           },
           {
             path: '/dorm/test-work',
             name: 'TestWork',
-            component: () => import('@/views/dashboard/TestWork'),
-            meta: { title: '人工分配宿舍', keepAlive: true, permission: ['dashboard'] }
+            component: () => import('@/views/management/TestWork'),
+            meta: { title: '宿舍分配', keepAlive: true }
           }
         ]
       },

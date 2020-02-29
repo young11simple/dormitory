@@ -13,7 +13,7 @@ import { adminRouterMap, studentRouterMap } from '@/config/router.config'
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
 const whiteList = ['login', 'register', 'registerResult'] // no redirect whitelist
-const defaultRoutePath = '/dashboard/workplace'
+const defaultRoutePath = '/management/dormInfo'
 
 router.beforeEach((to, from, next) => {
   NProgress.start() // start progress bar
