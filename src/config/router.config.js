@@ -1,6 +1,6 @@
 // eslint-disable-next-line
 import { UserLayout, BasicLayout, RouteView, BlankLayout, PageView } from '@/layouts'
-import { dormManage, dormPay, stuInfo } from '@/core/icons'
+// import { worker } from '@/core/icons'
 
 export const adminRouterMap = [
   {
@@ -10,13 +10,13 @@ export const adminRouterMap = [
     meta: { title: '首页' },
     redirect: '/pay/payTotal',
     children: [
-      // student
+      // studentInfo
       {
         path: '/studentInfo',
         name: 'studentInfo',
         redirect: '/studentInfo/search',
         component: RouteView,
-        meta: { title: '学生信息', keepAlive: true, icon: stuInfo },
+        meta: { title: '学生信息', keepAlive: true, icon: 'team' },
         children: [
           {
             path: '/studentInfo/search',
@@ -38,25 +38,25 @@ export const adminRouterMap = [
         name: 'pay',
         redirect: '/pay/payTotal',
         component: RouteView,
-        meta: { title: '宿舍用电', keepAlive: true, icon: dormPay, permission: ['pay'] },
+        meta: { title: '电网缴费', keepAlive: true, icon: 'property-safety', permission: ['pay'] },
         children: [
+          {
+            path: '/pay/SCAUNetTotal',
+            name: 'SCAUNetTotal',
+            component: () => import('@/views/dashboard/Analysis'),
+            meta: { title: '校园网信息', keepAlive: false }
+          },
           {
             path: '/pay/payTotal',
             name: 'payTotal',
-            component: () => import('@/views/dashboard/Analysis'),
-            meta: { title: '缴费信息', keepAlive: false, permission: ['pay'] }
-          },
-          {
-            path: '/pay/eleTotal',
-            name: 'eleTotal',
-            component: () => import('@/views/dashboard/Analysis'),
+            component: () => import('@/views/pay/payTotal'),
             meta: { title: '用电信息', keepAlive: false, permission: ['pay'] }
           },
           {
             path: '/pay/noPayTotal',
             name: 'noPayTotal',
-            component: () => import('@/views/dashboard/Analysis'),
-            meta: { title: '未缴费通知', keepAlive: false, permission: ['pay'] }
+            component: () => import('@/views/pay/payTotal'),
+            meta: { title: '缴费通知', keepAlive: false, permission: ['pay'] }
           },
           {
             path: '/pay/elePreTotal',
@@ -72,7 +72,7 @@ export const adminRouterMap = [
         name: 'dashboard',
         redirect: '/dashboard/workplace',
         component: RouteView,
-        meta: { title: '宿舍管理', keepAlive: true, icon: dormManage, permission: ['dashboard'] },
+        meta: { title: '宿舍管理', keepAlive: true, icon: 'home', permission: ['dashboard'] },
         children: [
           {
             path: '/dashboard/analysis',
@@ -103,6 +103,50 @@ export const adminRouterMap = [
             name: 'TestWork',
             component: () => import('@/views/dashboard/TestWork'),
             meta: { title: '人工分配宿舍', keepAlive: true, permission: ['dashboard'] }
+          }
+        ]
+      },
+      // register
+      {
+        path: '/register',
+        name: 'register',
+        redirect: '/register/visitor',
+        component: RouteView,
+        meta: { title: '相关登记', keepAlive: true, icon: 'form' },
+        children: [
+          {
+            path: '/registor/visitor',
+            name: 'visitor',
+            component: () => import('@/views/register/visitor'),
+            meta: { title: '访客登记', keepAlive: false }
+          },
+          {
+            path: '/registor/disobey',
+            name: 'disobey',
+            component: () => import('@/views/register/disobey'),
+            meta: { title: '违纪登记', keepAlive: false }
+          },
+          {
+            path: '/registor/check',
+            name: 'check',
+            component: () => import('@/views/register/check'),
+            meta: { title: '卫生检查', keepAlive: false }
+          }
+        ]
+      },
+      // employee
+      {
+        path: '/worker',
+        name: 'worker',
+        redirect: '/worker/wokerMan',
+        component: RouteView,
+        meta: { title: '员工管理', keepAlive: true, icon: 'solution' },
+        children: [
+          {
+            path: '/worker/wokerMan',
+            name: 'wokerMan',
+            component: () => import('@/views/register/visitor'),
+            meta: { title: '员工信息', keepAlive: false }
           }
         ]
       },
@@ -172,7 +216,7 @@ export const studentRouterMap = [
     name: 'index',
     component: BasicLayout,
     meta: { title: '首页' },
-    redirect: '/pay/eleTotal',
+    redirect: '/pay/payTotal',
     children: [
       // pay
       {
@@ -180,19 +224,69 @@ export const studentRouterMap = [
         name: 'pay',
         redirect: '/pay/payTotal',
         component: RouteView,
-        meta: { title: '宿舍缴费', keepAlive: true, icon: dormPay, permission: ['pay'] },
+        meta: { title: '用电信息', keepAlive: true, icon: 'dollar', permission: ['pay'] },
         children: [
           {
             path: '/pay/payTotal',
             name: 'payTotal',
-            component: () => import('@/views/dashboard/Analysis'),
-            meta: { title: '宿舍缴费信息', keepAlive: false, permission: ['pay'] }
+            component: () => import('@/views/pay/payTotal'),
+            meta: { title: '电表充值', keepAlive: false }
           },
           {
-            path: '/pay/eleTotal',
-            name: 'eleTotal',
-            component: () => import('@/views/dashboard/Analysis'),
-            meta: { title: '宿舍用电信息', keepAlive: false, permission: ['pay'] }
+            path: '/pay/eleSearch',
+            name: 'eleSearch',
+            component: () => import('@/views/pay/eleSearch'),
+            meta: { title: '用电查询', keepAlive: false, permission: ['pay'] }
+          },
+          {
+            path: '/pay/refund',
+            name: 'refund',
+            component: () => import('@/views/pay/refund'),
+            meta: { title: '电表退费', keepAlive: false, permission: ['pay'] }
+          },
+          {
+            path: '/pay/paySearch',
+            name: 'paySearch',
+            component: () => import('@/views/pay/paySearch'),
+            meta: { title: '充值记录查询', keepAlive: false, permission: ['pay'] }
+          }
+        ]
+      },
+      // repair
+      {
+        path: '/repair',
+        name: 'repair',
+        component: RouteView,
+        redirect: '/repair/apply',
+        meta: { title: '宿舍报修', icon: 'tool', keepAlive: true },
+        children: [
+          {
+            path: '/repair/apply',
+            name: 'apply',
+            component: () => import('@/views/repair/apply'),
+            meta: { title: '报修申请', keepAlive: false }
+          },
+          {
+            path: '/repair/showProgress',
+            name: 'showProgress',
+            component: () => import('@/views/repair/showProgress'),
+            meta: { title: '查看进度', keepAlive: false }
+          }
+        ]
+      },
+      // news
+      {
+        path: '/news',
+        name: 'news',
+        component: RouteView,
+        redirect: '/news/showNews',
+        meta: { title: '相关消息', icon: 'mail', keepAlive: true },
+        children: [
+          {
+            path: '/news/showNews',
+            name: 'showNews',
+            component: () => import('@/views/repair/apply'),
+            meta: { title: '相关消息', keepAlive: false }
           }
         ]
       },
@@ -202,7 +296,7 @@ export const studentRouterMap = [
         component: RouteView,
         redirect: '/account/center',
         name: 'account',
-        meta: { title: '个人页', icon: 'user', keepAlive: true, permission: ['user'] },
+        meta: { title: '个人信息', icon: 'user', keepAlive: true, permission: ['user'] },
         children: [
           {
             path: '/account/center',
@@ -271,7 +365,7 @@ export const asyncRouterMap = [
         name: 'pay',
         redirect: '/pay/payTotal',
         component: RouteView,
-        meta: { title: '宿舍缴费', keepAlive: true, icon: dormPay, permission: ['pay'], roles: ['admin'] },
+        meta: { title: '宿舍缴费', keepAlive: true, icon: 'property-safety', permission: ['pay'], roles: ['admin'] },
         children: [
           {
             path: '/pay/payTotal',
@@ -305,7 +399,7 @@ export const asyncRouterMap = [
         name: 'dashboard',
         redirect: '/dashboard/workplace',
         component: RouteView,
-        meta: { title: '宿舍管理', keepAlive: true, icon: dormManage, permission: ['dashboard'], roles: ['admin'] },
+        meta: { title: '宿舍管理', keepAlive: true, icon: 'home', permission: ['dashboard'], roles: ['admin'] },
         children: [
           {
             path: '/dashboard/analysis',

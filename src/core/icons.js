@@ -11,5 +11,7 @@ import dormManage from '@/assets/icons/dormManage.svg?inline'
 import dormPay from '@/assets/icons/pay.svg?inline'
 import dormReg from '@/assets/icons/reg.svg?inline'
 import stuInfo from '@/assets/icons/studentInfo.svg?inline'
+import rep from '@/assets/icons/repair.svg?inline'
+import worker from '@/assets/icons/worker.svg?inline'
 
-export { bxAnaalyse, dormManage, dormPay, dormReg, stuInfo }
+export { bxAnaalyse, dormManage, dormPay, dormReg, stuInfo, rep, worker }

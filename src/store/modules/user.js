@@ -10,10 +10,14 @@ const user = {
     welcome: '',
     avatar: '',
     roles: [],
-    info: {}
+    info: {},
+    ammeter: []
   },
 
   mutations: {
+    SET_AMMETER: (state, ammeter) => {
+      state.ammeter.unshift(ammeter)
+    },
     SET_TOKEN: (state, token) => {
       state.token = token
     },
