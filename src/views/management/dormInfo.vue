@@ -46,6 +46,21 @@ const innerColumns = [
     width: '10%'
   },
   {
+    title: '学号',
+    dataIndex: 'account',
+    width: '10%'
+  },
+  {
+    title: '性别',
+    dataIndex: 'gender',
+    width: '10%'
+  },
+  {
+    title: '联系方式',
+    dataIndex: 'contact',
+    width: '10%'
+  },
+  {
     title: '院系',
     dataIndex: 'college',
     width: '10%'
@@ -74,6 +89,9 @@ for (let i = 0; i < 10; i++) {
 for (let i = 0; i < 2; i++) {
   innerData.push({
     name: `Edrward ${i}`,
+    account: `20162505020${i}`,
+    gender: '女',
+    contact: `1580203356${i}`,
     college: '4',
     majorClass: '网工2班',
     level: '2016级'
@@ -93,7 +111,7 @@ export default {
         pageSizeOptions: ['5', '10', '15', '20'],
         showQuickJumper: true
       },
-      rooms: {}
+      rooms: []
     }
   }
 }

@@ -26,7 +26,7 @@
               type="text"
               placeholder="账户:工号"
               v-decorator="[
-                'username',
+                'userId',
                 {rules: [{ required: true, message: '请输入帐户号' }, { validator: handleUsernameOrEmail }], validateTrigger: 'change'}
               ]"
             >
@@ -63,7 +63,7 @@
               type="text"
               placeholder="账户: 学号"
               v-decorator="[
-                'username',
+                'userId',
                 {rules: [{ required: true, message: '请输入帐户名' }, { validator: handleUsernameOrEmail }], validateTrigger: 'change'}
               ]"
             >
@@ -100,7 +100,7 @@
               type="text"
               placeholder="账户"
               v-decorator="[
-                'username',
+                'userId',
                 {rules: [{ required: true, message: '请输入帐户名' }, { validator: handleUsernameOrEmail }], validateTrigger: 'change'}
               ]"
             >
@@ -133,7 +133,6 @@
           style="float: right;"
         >忘记密码</router-link>
       </a-form-item>
-
       <a-form-item style="margin-top:24px">
         <a-button
           size="large"
@@ -144,51 +143,24 @@
           :disabled="state.loginBtn"
         >确定</a-button>
       </a-form-item>
-
-      <!-- <div class="user-login-other">
-        <span>其他登录方式</span>
-        <a>
-          <a-icon class="item-icon" type="alipay-circle"></a-icon>
-        </a>
-        <a>
-          <a-icon class="item-icon" type="taobao-circle"></a-icon>
-        </a>
-        <a>
-          <a-icon class="item-icon" type="weibo-circle"></a-icon>
-        </a>
-        <router-link class="register" :to="{ name: 'register' }">注册账户</router-link>
-      </div>-->
     </a-form>
-
-    <two-step-captcha
-      v-if="requiredTwoStepCaptcha"
-      :visible="stepCaptchaVisible"
-      @success="stepCaptchaSuccess"
-      @cancel="stepCaptchaCancel"
-    ></two-step-captcha>
   </div>
 </template>
 
 <script>
-import md5 from 'md5'
-import TwoStepCaptcha from '@/components/tools/TwoStepCaptcha'
+// import md5 from 'md5'
 import { mapActions } from 'vuex'
 import { timeFix } from '@/utils/util'
-import { getSmsCaptcha, get2step } from '@/api/login'
+import { getSmsCaptcha } from '@/api/login'
 import { ROLE_ID } from '@/store/mutation-types'
 import Vue from 'vue'
 // import store from '@/store'
 
 export default {
-  components: {
-    TwoStepCaptcha
-  },
   data () {
     return {
       customActiveKey: 'tab1',
       loginBtn: false,
-      // login type: 0 email, 1 username, 2 telephone
-      loginType: 0,
       isLoginError: false,
       requiredTwoStepCaptcha: false,
       stepCaptchaVisible: false,
@@ -201,16 +173,6 @@ export default {
         smsSendBtn: false
       }
     }
-  },
-  created () {
-    get2step({})
-      .then(res => {
-        this.requiredTwoStepCaptcha = res.result.stepCode
-      })
-      .catch(() => {
-        this.requiredTwoStepCaptcha = false
-      })
-    // this.requiredTwoStepCaptcha = true
   },
   methods: {
     ...mapActions(['Login', 'Logout']),
@@ -240,26 +202,25 @@ export default {
 
       state.loginBtn = true
 
-      const validateFieldsKey = customActiveKey === 'tab1' ? ['username', 'password'] : ['username', 'password']
+      const validateFieldsKey = ['userId', 'password']
 
       validateFields(validateFieldsKey, { force: true }, (err, values) => {
         if (!err) {
+          const loginParams = { ...values }
           if (customActiveKey === 'tab1') {
             Vue.ls.set(ROLE_ID, 'admin')
-            // store.commit('SET_ROLES', 'admin')
+            loginParams.auth = 1
             console.log('管理员上线')
           } else if (customActiveKey === 'tab2') {
-            // store.commit('SET_ROLES', 'student')
             Vue.ls.set(ROLE_ID, 'student')
+            loginParams.auth = 2
             console.log('学生上线')
           } else {
             Vue.ls.set(ROLE_ID, 'others')
+            loginParams.auth = 3
           }
-          console.log('login form', values)
-          const loginParams = { ...values }
-          delete loginParams.username
-          loginParams[!state.loginType ? 'email' : 'username'] = values.username
-          loginParams.password = md5(values.password)
+          // loginParams.password = md5(values.password)
+          console.log('login form', loginParams)
           Login(loginParams)
             .then(res => this.loginSuccess(res))
             .catch(err => this.requestFailed(err))
@@ -322,18 +283,6 @@ export default {
       })
     },
     loginSuccess (res) {
-      console.log(res)
-      // check res.homePage define, set $router.push name res.homePage
-      // Why not enter onComplete
-      /*
-      this.$router.push({ name: 'analysis' }, () => {
-        console.log('onComplete')
-        this.$notification.success({
-          message: '欢迎',
-          description: `${timeFix()}，欢迎回来`
-        })
-      })
-      */
       this.$router.push({ path: '/' })
       // 延迟 1 秒显示欢迎信息
       setTimeout(() => {
@@ -345,6 +294,7 @@ export default {
       this.isLoginError = false
     },
     requestFailed (err) {
+      console.log(err)
       this.isLoginError = true
       this.$notification['error']({
         message: '错误',

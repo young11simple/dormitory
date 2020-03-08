@@ -1,6 +1,6 @@
-import { asyncRouterMap, constantRouterMap } from '@/config/router.config'
-import Vue from 'vue'
-import { ROLE_ID } from '@/store/mutation-types'
+import { constantRouterMap } from '@/config/router.config'
+// import Vue from 'vue'
+// import { ROLE_ID } from '@/store/mutation-types'
 
 /**
  * 过滤账户是否拥有某一个权限，并将菜单从加载列表移除
@@ -31,36 +31,36 @@ import { ROLE_ID } from '@/store/mutation-types'
  * @returns {*}
  */
 // eslint-disable-next-line
-function hasRole(roles, route) {
-  if (route.meta && route.meta.roles) {
-    console.log('roles.id', roles.id)
-    if (Vue.ls.get(ROLE_ID) === 'admin') {
-      roles.id = 'admin'
-    } else if (Vue.ls.get(ROLE_ID) === 'student') {
-      roles.id = 'student'
-    } else {
-      roles.id = 'others'
-    }
-    console.log('roles.id', roles.id)
-    return route.meta.roles.includes(roles.id)
-  } else {
-    return true
-  }
-}
+// function hasRole(roles, route) {
+//   if (route.meta && route.meta.roles) {
+//     console.log('roles.id', roles.id)
+//     if (Vue.ls.get(ROLE_ID) === 'admin') {
+//       roles.id = 'admin'
+//     } else if (Vue.ls.get(ROLE_ID) === 'student') {
+//       roles.id = 'student'
+//     } else {
+//       roles.id = 'others'
+//     }
+//     console.log('roles.id', roles.id)
+//     return route.meta.roles.includes(roles.id)
+//   } else {
+//     return true
+//   }
+// }
 
-function filterAsyncRouter (routerMap, roles) {
-  const accessedRouters = routerMap.filter(route => {
-    // if (hasPermission(roles.permissionList, route)) {
-    if (hasRole(roles, route)) {
-      if (route.children && route.children.length) {
-        route.children = filterAsyncRouter(route.children, roles)
-      }
-      return true
-    }
-    return false
-  })
-  return accessedRouters
-}
+// function filterAsyncRouter (routerMap, roles) {
+//   const accessedRouters = routerMap.filter(route => {
+//     // if (hasPermission(roles.permissionList, route)) {
+//     if (hasRole(roles, route)) {
+//       if (route.children && route.children.length) {
+//         route.children = filterAsyncRouter(route.children, roles)
+//       }
+//       return true
+//     }
+//     return false
+//   })
+//   return accessedRouters
+// }
 
 const permission = {
   state: {
@@ -74,14 +74,14 @@ const permission = {
     }
   },
   actions: {
-    GenerateRoutes ({ commit }, data) {
-      return new Promise(resolve => {
-        const { roles } = data
-        const accessedRouters = filterAsyncRouter(asyncRouterMap, roles)
-        commit('SET_ROUTERS', accessedRouters)
-        resolve()
-      })
-    }
+    // GenerateRoutes ({ commit }, data) {
+    //   return new Promise(resolve => {
+    //     const { roles } = data
+    //     const accessedRouters = filterAsyncRouter(constantRouterMap, roles)
+    //     commit('SET_ROUTERS', accessedRouters)
+    //     resolve()
+    //   })
+    // }
   }
 }
 
