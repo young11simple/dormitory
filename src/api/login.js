@@ -7,8 +7,6 @@ import { axios } from '@/utils/request'
  *     userId: '',
  *     password: '',
  *     auth: 1,2,3,
- *     remember_me: true,
- *     captcha: '12345'
  * }
  * @param parameter
  * @returns {*}
@@ -16,6 +14,14 @@ import { axios } from '@/utils/request'
 export function login (parameter) {
   return axios({
     url: '/login',
+    method: 'post',
+    data: parameter
+  })
+}
+
+export function updatePW (parameter) {
+  return axios({
+    url: '/updatePw',
     method: 'post',
     data: parameter
   })

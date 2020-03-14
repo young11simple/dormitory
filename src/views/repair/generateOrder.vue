@@ -20,12 +20,12 @@
                 <a-form-item style="display:flex" label="订单号码"><a-input v-model="item.repairId" /></a-form-item>
               </a-col>
               <a-col :span="12">
-                <a-form-item style="display:flex" label="报修人员"><a-input v-model="item.userName" /></a-form-item>
+                <a-form-item style="display:flex" label="报修人员"><a-input v-model="item.name" /></a-form-item>
               </a-col>
             </a-row>
             <a-row :gutter="24">
               <a-col :span="12">
-                <a-form-item style="display:flex" label="宿舍号码"><a-input v-model="item.dormId" /></a-form-item>
+                <a-form-item style="display:flex" label="宿舍号码"><a-input v-model="item.address" /></a-form-item>
               </a-col>
               <a-col :span="12">
                 <a-form-item style="display:flex" label="联系方式"><a-input v-model="item.telephone" /></a-form-item>
@@ -44,7 +44,7 @@
                 <a-form-item style="display:flex" label="申请时间"><a-input v-model="item.time" /></a-form-item>
               </a-col>
               <a-col :span="12">
-                <a-form-item style="display:flex" label="维修人员"><a-input v-model="name" /></a-form-item>
+                <a-form-item style="display:flex" label="维修人员"><a-input v-model="item.repairUserName" /></a-form-item>
               </a-col>
             </a-row>
             <a-row :gutter="24">
@@ -63,6 +63,7 @@
 </template>
 <script>
 import store from '@/store'
+import { mapActions } from 'vuex'
 const columns = [
   {
     title: '订单号',
@@ -70,7 +71,7 @@ const columns = [
   },
   {
     title: '报修者',
-    dataIndex: 'userName'
+    dataIndex: 'name'
   },
   {
     title: '联系电话',
@@ -78,7 +79,7 @@ const columns = [
   },
   {
     title: '宿舍号',
-    dataIndex: 'dormId'
+    dataIndex: 'address'
   },
   {
     title: '报修类别',
@@ -98,19 +99,6 @@ const columns = [
     scopedSlots: { customRender: 'operation' }
   }
 ]
-const data = []
-for (let i = 0; i < 10; i++) {
-  data.push({
-    repairId: `20200306${i}`,
-    userName: `nana${i}`,
-    telephone: `1580203356${i}`,
-    dormId: `9-12${i}`,
-    type: '水龙头',
-    detail: '漏水',
-    time: new Date().toLocaleDateString(),
-    isGet: false
-  })
-}
 export default {
   data () {
     return {
@@ -123,20 +111,19 @@ export default {
       },
       selectedRowKeys: [],
       columns,
-      data,
+      data: [],
       item: {},
       visible: false,
-      name: '',
       selectedData: []
     }
   },
   methods: {
+    ...mapActions(['getRepairListApi', 'getDormByIdApi']),
     onSelectChange (selectedRowKeys) {
       console.log('selectedRowKeys', selectedRowKeys)
       this.selectedRowKeys = selectedRowKeys
     },
     handlePrintDetails (item) {
-      console.log(item)
       this.item = item
       this.visible = true
       this.name = store.getters.userInfo.name
@@ -160,12 +147,35 @@ export default {
         this.selectedData = this.data.filter(item => s.has(item.repairId))
         this.data = this.data.filter(item => !s.has(item.repairId))
       }
+    },
+    handleScuccessfully (res) {
+      if (res.size > 0) {
+        const result = res.repairInfo
+        result.forEach(element => {
+          element.time = element.time.replace(/T/, ' ').slice(0, element.time.indexOf('.'))
+          const jsonData2 = { dormId: element.dormId }
+          this.getDormByIdApi(jsonData2)
+            .then(res => {
+              element.address = res.area + res.buildId + '-' + res.roomId
+              this.data.push(element)
+            })
+            .catch(err => { console.log('err:', err) })
+            .finally()
+        })
+      }
     }
   },
   computed: {
     hasSelected () {
       return this.selectedRowKeys.length > 0
     }
+  },
+  mounted () {
+    const jsonData = { repairUserId: store.getters.userInfo.userId, process: 0 }
+    this.getRepairListApi(jsonData)
+      .then(res => this.handleScuccessfully(res))
+      .catch(err => { console.log('err:', err) })
+      .finally()
   }
 }
 </script>

@@ -1,48 +1,67 @@
 <template>
   <div id="components-form-disobey">
-    <a-form>
+    <div style="text-align:center"><a-icon type="warning" />{{ selfInfo.area }}{{ selfInfo.buildId }}栋的违纪记录</div>
+    <hr style="align:center; width:300;color:#987cb9; SIZE:1">
+    <a-form class="ant-advanced-search-form" :form="form" @submit="handleSubmit">
       <a-row :gutter="24">
-        <a-col :span="8">
-          <a-form-item label="违规序号" class="formItem">
-            <a-input v-model="disobeyInfo.disobeyID" placeholder="当天时间点20XXXXXXxxxx" />
+        <a-col
+          v-for="(value,index) in items"
+          :key="index"
+          :span="6"
+        >
+          <a-form-item :label="value.value">
+            <a-input
+              v-decorator="[
+                value.name,
+                {
+                  rules: [
+                    {
+                      required: true,
+                      message: '请填写信息!',
+                    },
+                  ],
+                },
+              ]"
+              :placeholder="value.place"
+            />
           </a-form-item>
         </a-col>
-        <a-col :span="8">
-          <a-form-item label="违规者们" class="formItem">
-            <a-input placeholder="违规者们姓名" v-model="disobeyInfo.who" />
+        <a-col :key="3" :span="6">
+          <a-form-item label="违纪级别">
+            <a-select
+              v-decorator="[
+                'level',
+                { rules: [{ required: true, message: '请选择信息' }] },
+              ]"
+              placeholder="请选择信息">
+              <a-select-option key="低" value="1">低</a-select-option>
+              <a-select-option key="中" value="2">中</a-select-option>
+              <a-select-option key="高" value="3">高</a-select-option>
+            </a-select>
           </a-form-item>
         </a-col>
-        <a-col :span="8">
-          <a-form-item label="违规宿舍" class="formItem">
-            <a-input placeholder="事发地点" v-model="disobeyInfo.roomID"/>
+        <a-col :key="4" :span="12">
+          <a-form-item label="违规事项">
+            <a-input
+              v-decorator="['reason',{ rules: [{required: true,message: '请填写信息!',},],},]"
+              placeholder="具体违规事项"
+            />
+          </a-form-item>
+        </a-col>
+        <a-col :key="5" :span="8">
+          <a-form-item label="违规时间">
+            <a-date-picker showTime placeholder="选择时间" v-decorator="['time', config]" format="YYYY-MM-DD HH:mm:ss"/>
           </a-form-item>
         </a-col>
       </a-row>
-      <a-row :gutter="24">
-        <a-col :span="8">
-          <a-form-item label="违规时间" class="formItem">
-            <a-input placeholder="事发时间点" v-model="disobeyInfo.when"/>
-          </a-form-item>
-        </a-col>
-        <a-col :span="8">
-          <a-form-item label="检察人员" class="formItem">
-            <a-input placeholder="检察人员" v-model="disobeyInfo.inspector" />
-          </a-form-item>
-        </a-col>
-        <a-col :span="8">
-          <a-form-item label="违规事项" class="formItem">
-            <a-input placeholder="违规事项" v-model="disobeyInfo.what" />
-          </a-form-item>
-        </a-col>
-      </a-row>
-      <a-row :gutters="24">
-        <a-col :span="8" />
-        <a-col :span="8" />
-        <a-col :span="7">
-          <a-button-group class="btn">
-            <a-button type="primary" @click="handleAdd">添加</a-button>
-            <a-button type="primary" @click="handleReset">重置</a-button>
-          </a-button-group>
+      <a-row>
+        <a-col :span="24" :style="{ textAlign: 'right' }">
+          <a-button type="primary" html-type="submit">
+            添加
+          </a-button>
+          <a-button :style="{ marginLeft: '8px' }" @click="handleReset">
+            重置
+          </a-button>
         </a-col>
       </a-row>
     </a-form>
@@ -50,13 +69,12 @@
       id="tabTop"
       :columns="columns"
       :dataSource="data"
-      rowKey="disobeyID"
       bordered
       :pagination="pagination"
       class="tabStyle"
     >
       <template slot="operation" slot-scope="text,record">
-        <a-popconfirm title="确认删除吗" @confirm="()=>handleDelete(record.disobeyID)">
+        <a-popconfirm title="确认删除吗" @confirm="()=>handleDelete(record.key)">
           <a-button type="primary">删除</a-button>
         </a-popconfirm>
       </template>
@@ -65,61 +83,57 @@
 </template>
 
 <script>
+import store from '@/store'
+import { mapActions } from 'vuex'
 const columns = [
   {
-    title: '违规序号',
-    dataIndex: 'disobeyID',
+    title: '违规宿舍',
+    dataIndex: 'roomId',
     width: '10%',
-    scopedSlots: { customRender: 'disobeyID' }
+    scopedSlots: { customRender: 'roomId' }
   },
   {
-    title: '宿舍号',
-    dataIndex: 'roomID',
-    width: '10%',
-    scopedSlots: { customRender: 'roomID' }
+    title: '学号',
+    dataIndex: 'userId',
+    width: '15%',
+    scopedSlots: { customRender: 'userId' }
   },
   {
-    title: '违规者',
-    dataIndex: 'who',
+    title: '姓名',
+    dataIndex: 'name',
+    width: '10%',
+    scopedSlots: { customRender: 'name' }
+  },
+  {
+    title: '其他信息',
+    dataIndex: 'info',
     width: '20%',
-    scopedSlots: { customRender: 'who' }
+    scopedSlots: { customRender: 'info' }
   },
   {
     title: '违规时间',
-    dataIndex: 'when',
+    dataIndex: 'time',
     width: '15%',
-    scopedSlots: { customRender: 'when' }
-  },
-  {
-    title: '检察人员',
-    dataIndex: 'inspector',
-    width: '10%',
-    scopedSlots: { customRender: 'inspector' }
+    scopedSlots: { customRender: 'time' }
   },
   {
     title: '违规事项',
-    dataIndex: 'what',
+    dataIndex: 'reason',
     width: '20%',
-    scopedSlots: { customRender: 'what' }
+    scopedSlots: { customRender: 'reson' }
+  },
+  {
+    title: '违规级别',
+    dataIndex: 'level',
+    width: '10%',
+    scopedSlots: { customRender: 'level' }
   }
 ]
-const data = []
-for (let i = 0; i < 10; i++) {
-  data.push({
-    disobeyID: i.toString(),
-    roomID: `Edrward ${i}`,
-    who: `Edrward ${i + 1}`,
-    when: '朋友',
-    what: '是',
-    inspector: `Edrward ${i}`
-  })
-}
-console.log(data)
 export default {
   data () {
     return {
       columns,
-      data,
+      data: [],
       pagination: {
         defaultPageSize: 5,
         showTotal: total => `共 ${total} 条数据`,
@@ -127,10 +141,21 @@ export default {
         pageSizeOptions: ['5', '10', '15', '20'],
         showQuickJumper: true
       },
-      disobeyInfo: {}
+      disobeyInfo: {},
+      items: [
+        { value: '违规宿舍', name: 'roomId', place: '违规宿舍' },
+        { value: '违规者学号', name: 'userId', place: '违规者学号' },
+        { value: '违规者姓名', name: 'name', place: '违规者姓名' }
+      ],
+      config: {
+        rules: [{ type: 'object', required: true, message: '请选择选项!' }]
+      },
+      form: this.$form.createForm(this, { name: 'advanced_apply' }),
+      selfInfo: {}
     }
   },
   methods: {
+    ...mapActions(['addDisobeyApi', 'getDisobeyListApi']),
     handleDelete (key) {
       console.log('key', key)
       this.data = this.data.filter(item => item.disobeyID !== key)
@@ -140,12 +165,52 @@ export default {
       this.data.unshift(this.disobeyInfo)
       this.disobeyInfo = {}
     },
+    handleSubmit (e) {
+      e.preventDefault()
+      this.form.validateFields((error, fieldsValue) => {
+        if (error) {
+          console.log('提交错误')
+        } else {
+          const values = {
+            ...fieldsValue,
+            'time': fieldsValue['time'].format('YYYY-MM-DD HH:mm:ss'),
+            'level': parseInt(fieldsValue['level'])
+          }
+          values.key = this.data.length
+          console.log('Received values of form: ', values)
+          this.data.push(values)
+          this.addDisobeyApi(values)
+            .then(res => this.handleSuccessfully(res, values))
+            .catch(err => this.handleFail(err))
+        }
+      })
+    },
     handleReset () {
-      console.log('reset:', this.disobeyInfo)
-      // this.form.resetFields()
-      this.disobeyInfo = {}
-      console.log('reseted:', this.disobeyInfo)
+      this.form.resetFields()
+    },
+    handleSuccessfully (res) {
+      console.log('add successfully', res)
+      this.$notification['success']({
+        message: '成功',
+        description: '添加成功',
+        duration: 2
+      })
+    },
+    handleFail (err) {
+      console.log('apply fail', err)
+      this.$notification['error']({
+        message: '错误',
+        description: '添加失败，请稍后再试',
+        duration: 2
+      })
     }
+  },
+  mounted () {
+    this.selfInfo.buildId = store.getters.userInfo.buildId
+    this.selfInfo.area = store.getters.userInfo.area
+    const jsonData = { area: this.selfInfo.area, buildId: this.selfInfo.buildId }
+    this.getDisobeyListApi(jsonData).then(res => { console.log(res) })
+      .catch(err => console.log(err))
   }
 }
 </script>

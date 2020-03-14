@@ -3,42 +3,47 @@
     <a-form id="formSet">
       <a-row :gutter="24">
         <a-col :span="8">
+          <a-form-item label="账号">
+            <a-input v-model="userInfo.userId" />
+          </a-form-item>
+        </a-col>
+        <a-col :span="8">
           <a-form-item label="姓名">
             <a-input v-model="userInfo.name" />
           </a-form-item>
         </a-col>
         <a-col :span="8">
           <a-form-item label="性别">
-            <a-input v-model="userInfo.gender"/>
-          </a-form-item>
-        </a-col>
-        <a-col :span="8">
-          <a-form-item label="权限">
-            <a-input v-model="auth"/>
+            <a-input v-model="gender[userInfo.gender]"/>
           </a-form-item>
         </a-col>
       </a-row>
       <a-row :gutter="24">
         <a-col :span="8">
-          <a-form-item label="负责区域">
-            <a-input v-model="workPlace"/>
+          <a-form-item label="学院">
+            <a-input v-model="userInfo.college"/>
           </a-form-item>
         </a-col>
         <a-col :span="8">
-          <a-form-item label="账号">
-            <a-input v-model="userInfo.userID" />
+          <a-form-item label="专业班级">
+            <a-input v-model="userInfo.major"/>
           </a-form-item>
         </a-col>
         <a-col :span="8">
-          <a-form-item label="入职时间">
-            <a-input v-model="userInfo.createTime" />
+          <a-form-item label="级别">
+            <a-input v-model="level" />
           </a-form-item>
         </a-col>
       </a-row>
       <a-row :gutter="24">
         <a-col :span="8">
           <a-form-item label="住址">
-            <a-input v-model="userInfo.address" />
+            <a-input v-model="livePlace"/>
+          </a-form-item>
+        </a-col>
+        <a-col :span="8">
+          <a-form-item label="权限">
+            <a-input v-model="auth"/>
           </a-form-item>
         </a-col>
         <a-col :span="8">
@@ -58,13 +63,17 @@ export default {
     return {
       userInfo: {},
       auth: '',
-      workPlace: ''
+      livePlace: '',
+      gender: ['女', '男'],
+      area: ['泰山区', '华山区', '启林北'],
+      level: ''
     }
   },
   created () {
     this.userInfo = store.getters.userInfo
     this.auth = '学生'
-    this.workPlace = this.userInfo.workArea + this.userInfo.buildingID + '栋'
+    this.livePlace = this.userInfo.area + '区' + this.userInfo.buildId + '栋' + this.userInfo.roomId
+    this.level = this.userInfo.level + '级'
   }
 }
 </script>

@@ -154,7 +154,7 @@ import { timeFix } from '@/utils/util'
 import { getSmsCaptcha } from '@/api/login'
 import { ROLE_ID } from '@/store/mutation-types'
 import Vue from 'vue'
-// import store from '@/store'
+import store from '@/store'
 
 export default {
   data () {
@@ -221,6 +221,7 @@ export default {
           }
           // loginParams.password = md5(values.password)
           console.log('login form', loginParams)
+          store.commit('SET_PASSWORD', loginParams.password)
           Login(loginParams)
             .then(res => this.loginSuccess(res))
             .catch(err => this.requestFailed(err))

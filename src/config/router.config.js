@@ -159,7 +159,7 @@ export const studentRouterMap = [
         name: 'pay',
         redirect: '/pay/payTotal',
         component: RouteView,
-        meta: { title: '用电信息', keepAlive: true, icon: 'dollar', permission: ['pay'] },
+        meta: { title: '用电信息', keepAlive: true, icon: 'dollar' },
         children: [
           {
             path: '/pay/payTotal',
@@ -171,19 +171,19 @@ export const studentRouterMap = [
             path: '/pay/eleSearch',
             name: 'eleSearch',
             component: () => import('@/views/pay/eleSearch'),
-            meta: { title: '用电查询', keepAlive: false, permission: ['pay'] }
+            meta: { title: '用电查询', keepAlive: false }
           },
-          {
-            path: '/pay/refund',
-            name: 'refund',
-            component: () => import('@/views/pay/refund'),
-            meta: { title: '电表退费', keepAlive: false, permission: ['pay'] }
-          },
+          // {
+          //   path: '/pay/refund',
+          //   name: 'refund',
+          //   component: () => import('@/views/pay/refund'),
+          //   meta: { title: '电表退费', keepAlive: false, permission: ['pay'] }
+          // },
           {
             path: '/pay/paySearch',
             name: 'paySearch',
             component: () => import('@/views/pay/paySearch'),
-            meta: { title: '充值记录查询', keepAlive: false, permission: ['pay'] }
+            meta: { title: '充值记录查询', keepAlive: false }
           }
         ]
       },

@@ -1,41 +1,113 @@
 <template>
-  <a-list
-    itemLayout="horizontal"
-    :dataSource="data"
-  >
-    <a-list-item slot="renderItem" slot-scope="item, index" :key="index">
-      <a-list-item-meta>
-        <a slot="title">{{ item.title }}</a>
-        <span slot="description">
-          <span class="security-list-description">{{ item.description }}</span>
-          <span v-if="item.value"> : </span>
-          <span class="security-list-value">{{ item.value }}</span>
-        </span>
-      </a-list-item-meta>
-      <template v-if="item.actions">
-        <a slot="actions" @click="item.actions.callback">{{ item.actions.title }}</a>
-      </template>
-
-    </a-list-item>
-  </a-list>
+  <div id="components-security">
+    <div id="password">
+      <span> 原密码： </span>
+      <span>
+        <a-input-password v-model="password" />
+      </span>
+      <span>
+        <a-button type="primary" style="margin:auto 5px" @click="handleModify">修改</a-button>
+        <a-button type="primary" v-if="isModified" @click="handleSave">保存</a-button>
+      </span>
+    </div>
+    <div v-if="isModified" style="margin: 20px 40px 20px auto">
+      <span> 请输入新密码： </span>
+      <span>
+        <a-input-password v-model="newPassword" />
+      </span>
+      <span> 请确认新密码： </span>
+      <span>
+        <a-input-password v-model="newPasswordAgain" />
+      </span>
+      <a-alert
+        message="Error"
+        description="前后密码不一致"
+        type="error"
+        showIcon
+        v-if="isSame"
+      />
+    </div>
+  </div>
 </template>
 
 <script>
+import store from '@/store'
+import { mapActions } from 'vuex'
+import router from '../../../router'
 export default {
   data () {
     return {
-      data: [
-        { title: '账户密码', description: '当前密码强度', value: '强', actions: { title: '修改', callback: () => { this.$message.info('This is a normal message') } } },
-        { title: '密保手机', description: '已绑定手机', value: '138****8293', actions: { title: '修改', callback: () => { this.$message.success('This is a message of success') } } },
-        { title: '密保问题', description: '未设置密保问题，密保问题可有效保护账户安全', value: '', actions: { title: '设置', callback: () => { this.$message.error('This is a message of error') } } },
-        { title: '备用邮箱', description: '已绑定邮箱', value: 'ant***sign.com', actions: { title: '修改', callback: () => { this.$message.warning('This is message of warning') } } },
-        { title: 'MFA 设备', description: '未绑定 MFA 设备，绑定后，可以进行二次确认', value: '', actions: { title: '绑定', callback: () => { this.$message.info('This is a normal message') } } }
-      ]
+      password: '',
+      isModified: false,
+      newPassword: '',
+      newPasswordAgain: '',
+      isSame: false
     }
+  },
+  methods: {
+    ...mapActions(['UpdatePW']),
+    handleModify () {
+      this.isModified = true
+    },
+    handleSave () {
+      const { UpdatePW } = this
+      if (this.newPassword === this.newPasswordAgain) {
+        if (this.newPassword === this.password) {
+          this.$notification['warn']({
+            message: '警告',
+            description: '不要跟原密码相同',
+            duration: 2
+          })
+        } else {
+          const data = { oldPw: this.password, newPw: this.newPassword }
+          UpdatePW(data)
+            .then(res => this.saveSuccessfully(res))
+            .catch(err => this.saveFail(err))
+            .finally()
+        }
+      } else {
+        this.isSame = true
+      }
+    },
+    saveSuccessfully (res) {
+      console.log('save successfully', res)
+      // this.newPassword = ''
+      // this.newPasswordAgain = ''
+      // this.isModified = false
+      this.$notification['success']({
+        message: '成功',
+        description: '密码修改成功,请重新登陆',
+        duration: 2
+      })
+      setTimeout(() => {
+        router.push({ path: '/user' })
+      }, 2000)
+    },
+    saveFail (err) {
+      console.log('save fail', err)
+      this.$notification['error']({
+        message: '错误',
+        description: ((err.response || {}).data || {}).message || '密码保存失败，请稍后再试',
+        duration: 3
+      })
+    }
+  },
+  created () {
+    this.password = store.getters.password
   }
 }
 </script>
 
 <style scoped>
-
+#password {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+#components-security {
+  padding: 24px 160px;
+  background: #fbfbfb;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+}
 </style>

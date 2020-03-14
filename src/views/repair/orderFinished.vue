@@ -11,6 +11,7 @@
 </template>
 <script>
 import store from '@/store'
+import { mapActions } from 'vuex'
 const columns = [
   {
     title: '订单号',
@@ -18,7 +19,7 @@ const columns = [
   },
   {
     title: '报修者',
-    dataIndex: 'userName'
+    dataIndex: 'name'
   },
   {
     title: '联系电话',
@@ -26,7 +27,7 @@ const columns = [
   },
   {
     title: '宿舍号',
-    dataIndex: 'dormId'
+    dataIndex: 'address'
   },
   {
     title: '报修类别',
@@ -51,21 +52,6 @@ const columns = [
     scopedSlots: { customRender: 'result' }
   }
 ]
-const data = []
-for (let i = 0; i < 10; i++) {
-  data.push({
-    repairId: `20200306${i}`,
-    userName: `nana${i}`,
-    telephone: `1580203356${i}`,
-    dormId: `9-12${i}`,
-    type: '水龙头',
-    detail: '漏水',
-    time: new Date().toLocaleDateString(),
-    repairUserId: store.getters.userInfo.userName,
-    repairTime: new Date().toLocaleDateString(),
-    result: '成功'
-  })
-}
 export default {
   data () {
     return {
@@ -77,8 +63,20 @@ export default {
         showQuickJumper: true
       },
       columns,
-      data
+      data: []
     }
+  },
+  methods: {
+    ...mapActions(['getRepairListApi', 'getDormByIdApi']),
+    handleScuccessfully (res) {
+    }
+  },
+  mounted () {
+    const jsonData = { repairUserId: store.getters.userInfo.userId, process: 2 }
+    this.getRepairListApi(jsonData)
+      .then(res => this.handleScuccessfully(res))
+      .catch(err => { console.log('err:', err) })
+      .finally()
   }
 }
 </script>

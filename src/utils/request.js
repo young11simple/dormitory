@@ -4,6 +4,7 @@ import store from '@/store'
 import notification from 'ant-design-vue/es/notification'
 import { VueAxios } from './axios'
 import { ACCESS_TOKEN } from '@/store/mutation-types'
+import router from '@/router/index'
 
 // 创建 axios 实例
 const service = axios.create({
@@ -49,6 +50,16 @@ service.interceptors.request.use(config => {
 
 // response interceptor
 service.interceptors.response.use((response) => {
+  if (response.data.code === 401) {
+    notification.warn({
+      message: '警告',
+      description: '身份信息过期，请重新登陆',
+      duration: 1
+    })
+    setTimeout(() => {
+      router.push({ path: '/user/login' })
+    })
+  }
   return response.data
 }, err)
 

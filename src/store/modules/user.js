@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { login, logout } from '@/api/login'
+import { login, logout, updatePW } from '@/api/login'
 import { ACCESS_TOKEN } from '../mutation-types'
 
 const user = {
@@ -10,13 +10,10 @@ const user = {
     avatar: '',
     roles: [],
     info: {},
-    ammeter: []
+    password: ''
   },
 
   mutations: {
-    SET_AMMETER: (state, ammeter) => {
-      state.ammeter.unshift(ammeter)
-    },
     SET_TOKEN: (state, token) => {
       state.token = token
     },
@@ -26,6 +23,9 @@ const user = {
     },
     SET_AVATAR: (state, avatar) => {
       state.avatar = avatar
+    },
+    SET_PASSWORD: (state, password) => {
+      state.password = password
     },
     SET_ROLES: (state, roles) => {
       state.roles = roles
@@ -42,10 +42,31 @@ const user = {
         login(userInfo).then(response => {
           const result = response
           console.log('result:', result)
-          commit('SET_INFO', result)
-          commit('SET_TOKEN', result.token)
-          Vue.ls.set(ACCESS_TOKEN, result.token)
-          resolve()
+          if (result.code === 201) {
+            reject(result)
+          } else {
+            commit('SET_INFO', result)
+            commit('SET_TOKEN', result.token)
+            Vue.ls.set(ACCESS_TOKEN, result.token)
+            resolve()
+          }
+        }).catch(error => {
+          reject(error)
+        })
+      })
+    },
+
+    // 修改密码
+    UpdatePW ({ commit }, pwInfo) {
+      return new Promise((resolve, reject) => {
+        updatePW(pwInfo).then(response => {
+          const result = response
+          console.log('result:', result)
+          if (result.code === 200) {
+            resolve(result)
+          } else {
+            reject(result)
+          }
         }).catch(error => {
           reject(error)
         })
@@ -63,7 +84,7 @@ const user = {
         }).finally(() => {
           commit('SET_TOKEN', '')
           commit('SET_ROLES', [])
-          // Vue.ls.remove(ACCESS_TOKEN)
+          Vue.ls.remove(ACCESS_TOKEN)
         })
       })
     }

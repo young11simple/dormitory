@@ -109,7 +109,6 @@ export default {
     }
   },
   created () {
-    console.log('mainMenu', this.mainMenu)
     this.menus = this.mainMenu.find(item => item.path === '/').children
     this.collapsed = !this.sidebarOpened
   },

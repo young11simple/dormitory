@@ -1,98 +1,139 @@
 <template>
-    <div id="components-form-demo-apply">
-      <a-form class="ant-advanced-apply-form">
-        <a-row :gutter="21">
-          <a-col :span="7">
-            <a-form-item class="ant-form-item" label="学号" >
-             <a-input :value="info.username" />
-            </a-form-item>
-          </a-col>
-          <a-col :span="7">
-            <a-form-item class="ant-form-item" label="姓名">
-             <a-input :value="info.name" />
-            </a-form-item>
-          </a-col>
-          <a-col :span="7">
-            <a-form-item class="ant-form-item" label="联系电话">
-             <a-input />
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-row :gutter="21">
-          <a-col :span="7">
-            <a-form-item class="ant-form-item" label="报修类别">
-             <a-select :defaultValue="repairClass[0]">
-               <a-select-option v-for="repairCla in repairClass" :key="repairCla">{{repairCla}} </a-select-option>
-             </a-select>
-             <a-select :defaultValue="repairClassConcrete[repairClass[0]][0]">
-               <a-select-option v-for="repairC in repairClassConcrete[0]" :key="repairC">{{repairC}}</a-select-option>
-             </a-select>
-            </a-form-item>
-          </a-col>
-          <a-col :span="7">
-            <a-form-item class="ant-form-item" label="所在校区">
-             <a-select :defaultValue="area[0]">
-               <a-select-option v-for="areaSCAU in area" :key="areaSCAU">{{areaSCAU}}</a-select-option>
-             </a-select>
-            </a-form-item>
-          </a-col>
-          <a-col :span="7">
-            <a-form-item class="ant-form-item" label="申请时间">
-              <a-input :value="time" />
-            </a-form-item>
-          </a-col>
-        </a-row>
-
-        <a-row :gutter="21">
-          <a-col :span="7">
-            <a-form-item class="ant-form-item" label="楼栋号">
-             <a-input placeholder="请输入楼栋号" />
-            </a-form-item>
-          </a-col>
-          <a-col :span="7">
-            <a-form-item class="ant-form-item" label="宿舍号">
-             <a-input placeholder="请输入宿舍号" />
-            </a-form-item>
-          </a-col>
-          <a-col :span="7">
-            <a-form-item class="ant-form-item" label="报修内容">
-             <a-input placeholder="请描述具体损坏情况"/>
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-row :gutter="21">
-          <a-col :span="7"></a-col>
-          <a-col :span="7"></a-col>
-          <a-col :span="7">
-            <a-button type="primary">提交</a-button>
-          </a-col>
-        </a-row>
-      </a-form>
-    </div>
+  <div id="components-form-demo-apply">
+    <a-form class="ant-advanced-search-form" :form="form" @submit="handleSubmit">
+      <a-row :gutter="24">
+        <a-col
+          v-for="(value,index) in items"
+          :key="index"
+          :span="8"
+        >
+          <a-form-item :label="value.value">
+            <a-input
+              v-decorator="[
+                value.name,
+                {
+                  rules: [
+                    {
+                      required: true,
+                      message: 'Input something!',
+                    },
+                  ],
+                },
+              ]"
+              :placeholder="value.place"
+            />
+          </a-form-item>
+        </a-col>
+        <a-col :key="5" :span="8">
+          <a-form-item label="报修类型">
+            <a-select
+              v-decorator="[
+                'type',
+                { rules: [{ required: true, message: '请选择报修类型' }] },
+              ]"
+              placeholder="请选择报修类型">
+              <a-select-option
+                v-for="repair in repairClass"
+                :key="repair"
+              >{{ repair }}</a-select-option
+              >
+            </a-select>
+          </a-form-item>
+        </a-col>
+        <a-col :key="6" :span="8">
+          <a-form-item label="申请时间">
+            <a-date-picker showTime placeholder="选择时间" v-decorator="['time', config]" format="YYYY/MM/DD HH:mm:ss"/>
+          </a-form-item>
+        </a-col>
+      </a-row>
+      <a-row>
+        <a-col :span="24" :style="{ textAlign: 'right' }">
+          <a-button type="primary" html-type="submit">
+            提交
+          </a-button>
+          <a-button :style="{ marginLeft: '8px' }" @click="handleReset">
+            重置
+          </a-button>
+        </a-col>
+      </a-row>
+    </a-form>
+  </div>
 </template>
 
 <script>
 import store from '@/store'
+import { repairApplyApi } from '@/api/APIs'
 export default {
   data () {
     return {
       info: {},
-      repairClass: ['厕所', '大厅', '浴室', '阳台'],
-      repairClassConcrete: { 厕所: ['爆水管', '水管漏水', '门'], 大厅: ['天花灯', '插座', '空调'], 浴室: ['水龙头', '花洒', '天花灯'], 阳台: ['水龙头', '门', '天花灯', '洗手台漏水', '晾衣架'] },
-      area: ['华山区', '泰山区', '燕山区'],
-      time: '',
-      visible: false
+      repairClass: ['爆水管', '水管漏水', '天花灯', '插座', '空调', '花洒', '晾衣架'],
+      items: [
+        { value: '学号', name: 'userId' },
+        { value: '姓名', name: 'name' },
+        { value: '地址', name: 'address' },
+        { value: '联系方式', name: 'telephone' },
+        // { value: '报修类别', name: 'type' },
+        { value: '报修详情', name: 'detail', place: '填写报修详情' }
+        // { value: '申请时间', name: 'time', place: '格式XXXX/XX/XX' }
+      ],
+      config: {
+        rules: [{ type: 'object', required: true, message: '请选择时间!' }]
+      },
+      form: this.$form.createForm(this, { name: 'advanced_apply' })
     }
   },
   methods: {
-    // showDrawer () {
-    //   this.visible = !this.visible
-    // }
+    handleSubmit (e) {
+      e.preventDefault()
+      this.form.validateFields((error, fieldsValue) => {
+        if (error) {
+          console.log('提交错误')
+        } else {
+          const values = {
+            ...fieldsValue,
+            'time': fieldsValue['time'].format('YYYY/MM/DD HH:mm:ss')
+          }
+          delete values.address
+          delete values.time
+          delete values.name
+          values.dormId = this.info.dormId
+          console.log('Received values of form: ', values)
+          repairApplyApi(values)
+            .then(res => this.handleSuccessfully(res))
+            .catch(err => this.handleFail(err))
+            .finally()
+        }
+      })
+    },
+    handleReset () {
+      this.form.resetFields(['type', 'detail', 'time'])
+    },
+    handleSuccessfully (res) {
+      console.log('apply successfully', res)
+      this.$notification['success']({
+        message: '成功',
+        description: '报修成功',
+        duration: 2
+      })
+    },
+    handleFail (err) {
+      console.log('apply fail', err)
+      this.$notification['error']({
+        message: '错误',
+        description: '报修失败，请稍后再试',
+        duration: 2
+      })
+    }
   },
-  created () {
-    this.info.username = store.getters.userInfo.username
-    this.info.name = store.getters.userInfo.name
-    this.time = (new Date()).toLocaleDateString()
+  mounted () {
+    this.info = store.getters.userInfo
+    this.form.setFieldsValue({
+      userId: this.info.userId,
+      name: this.info.name,
+      telephone: this.info.telephone,
+      address: this.info.area + this.info.buildId + '栋' + this.info.roomId
+    })
   }
 }
 </script>

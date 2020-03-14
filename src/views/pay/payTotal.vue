@@ -18,6 +18,7 @@
 <script>
 // import store from '@/store'
 import 'ant-design-vue/lib/collapse/style'
+import { mapActions } from 'vuex'
 export default {
   data () {
     return {
@@ -26,16 +27,22 @@ export default {
       ammeter: ['华山9-121', '泰山23-206', '泰山23-207']
     }
   },
-  methods: {},
-  watch: {}
-  //   created () {
-  //     if (store.getters.ammter.length > 0) {
-  //       this.hasAmmeter = true
-  //     } else {
-  //       this.hasAmmeter = false
-  //     }
-  //     this.hasAmmeter = true
-  //   }
+  methods: {
+    ...mapActions(['getAmmetersApi'])
+  },
+  watch: {},
+  mounted () {
+    // if (store.getters.ammter.length > 0) {
+    //   this.hasAmmeter = true
+    // } else {
+    //   this.hasAmmeter = false
+    // }
+    // this.hasAmmeter = true
+    this.getAmmetersApi()
+      .then(res => { console.log(res) })
+      .catch(err => { console.log('err', err) })
+      .finally()
+  }
 }
 </script>
 

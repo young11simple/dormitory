@@ -11,7 +11,8 @@ const getters = {
   addRouters: state => state.permission.addRouters,
   multiTab: state => state.app.multiTab,
   lang: state => state.i18n.lang,
-  ammeter: state => state.user.ammeter
+  ammeter: state => state.APIs.ammeter,
+  password: state => state.user.password
 }
 
 export default getters

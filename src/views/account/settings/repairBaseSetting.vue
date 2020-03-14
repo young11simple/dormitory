@@ -9,7 +9,7 @@
         </a-col>
         <a-col :span="8">
           <a-form-item label="性别">
-            <a-input v-model="userInfo.gender"/>
+            <a-input v-model="gender[userInfo.gender]"/>
           </a-form-item>
         </a-col>
         <a-col :span="8">
@@ -26,7 +26,7 @@
         </a-col>
         <a-col :span="8">
           <a-form-item label="账号">
-            <a-input v-model="userInfo.userID" />
+            <a-input v-model="userInfo.userId" />
           </a-form-item>
         </a-col>
         <a-col :span="8">
@@ -58,7 +58,8 @@ export default {
     return {
       userInfo: {},
       auth: '',
-      workPlace: ''
+      workPlace: '',
+      gender: ['女', '男']
     }
   },
   created () {

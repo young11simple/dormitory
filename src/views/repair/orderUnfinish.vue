@@ -41,6 +41,7 @@
 </template>
 <script>
 import store from '@/store'
+import { mapActions } from 'vuex'
 const columns = [
   {
     title: '订单号',
@@ -48,7 +49,7 @@ const columns = [
   },
   {
     title: '报修者',
-    dataIndex: 'userName'
+    dataIndex: 'name'
   },
   {
     title: '联系电话',
@@ -56,7 +57,7 @@ const columns = [
   },
   {
     title: '宿舍号',
-    dataIndex: 'dormId'
+    dataIndex: 'address'
   },
   {
     title: '报修类别',
@@ -86,25 +87,10 @@ const columns = [
     scopedSlots: { customRender: 'operation' }
   }
 ]
-const data = []
-for (let i = 0; i < 10; i++) {
-  data.push({
-    repairId: `20200306${i}`,
-    userName: `nana${i}`,
-    telephone: `1580203356${i}`,
-    dormId: `9-12${i}`,
-    type: '水龙头',
-    detail: '漏水',
-    time: new Date().toLocaleDateString(),
-    repairUserId: store.getters.userInfo.userName,
-    isGet: false,
-    disable: true
-  })
-}
 export default {
   data () {
-    this.cacheData = data.map(item => ({ ...item }))
     return {
+      data: [],
       pagination: {
         defaultPageSize: 5,
         showTotal: total => `共 ${total} 条数据`,
@@ -112,11 +98,11 @@ export default {
         pageSizeOptions: ['5', '10', '15', '20'],
         showQuickJumper: true
       },
-      columns,
-      data
+      columns
     }
   },
   methods: {
+    ...mapActions(['getRepairListApi', 'getDormByIdApi']),
     handleChange (value, key, column) {
       const newData = [...this.data]
       const target = newData.filter(item => key === item.repairId)[0]
@@ -134,6 +120,7 @@ export default {
       }
     },
     save (key) {
+      this.cacheData = this.data.map(item => ({ ...item }))
       const newData = [...this.data]
       const newCacheData = [...this.cacheData]
       const target = newData.filter(item => key === item.repairId)[0]
@@ -164,7 +151,16 @@ export default {
         description:
           '该订单已成功处理'
       })
+    },
+    handleScuccessfully (res) {
     }
+  },
+  mounted () {
+    const jsonData = { repairUserId: store.getters.userInfo.userId, process: 1 }
+    this.getRepairListApi(jsonData)
+      .then(res => this.handleScuccessfully(res))
+      .catch(err => { console.log('err:', err) })
+      .finally()
   }
 }
 </script>
