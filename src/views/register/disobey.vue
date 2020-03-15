@@ -87,7 +87,7 @@ import store from '@/store'
 import { mapActions } from 'vuex'
 const columns = [
   {
-    title: '违规宿舍',
+    title: '宿舍',
     dataIndex: 'roomId',
     width: '10%',
     scopedSlots: { customRender: 'roomId' }
@@ -123,7 +123,7 @@ const columns = [
     scopedSlots: { customRender: 'reson' }
   },
   {
-    title: '违规级别',
+    title: '级别',
     dataIndex: 'level',
     width: '10%',
     scopedSlots: { customRender: 'level' }

@@ -1,4 +1,5 @@
-import { getAmmeters, getRepairList, getDormById, addDisobey, getDisobeyList } from '@/api/getInfo'
+import { getAmmeters, getRepairList, getDormById, addDisobey, getDisobeyList,
+  ammeterPay, delAmmeter, addAmmeter, getDormByOther, getPayRecord, eleSearch } from '@/api/getInfo'
 const APIs = {
   state: {
     ammeter: []
@@ -15,6 +16,36 @@ const APIs = {
         getAmmeters().then(response => {
           const result = response
           console.log('getAmmetersApi result:', result)
+          if (result.code === 200) {
+            resolve(result)
+          } else {
+            reject(result)
+          }
+        }).catch(error => {
+          reject(error)
+        })
+      })
+    },
+    addAmmeterApi ({ commit }, params) {
+      return new Promise((resolve, reject) => {
+        addAmmeter(params).then(response => {
+          const result = response
+          console.log('addAmmeterApi result:', result)
+          if (result.code === 200) {
+            resolve(result)
+          } else {
+            reject(result)
+          }
+        }).catch(error => {
+          reject(error)
+        })
+      })
+    },
+    delAmmeterApi ({ commit }, params) {
+      return new Promise((resolve, reject) => {
+        delAmmeter(params).then(response => {
+          const result = response
+          console.log('delAmmeterApi result:', result)
           if (result.code === 200) {
             resolve(result)
           } else {
@@ -76,6 +107,66 @@ const APIs = {
         getDisobeyList(params).then(response => {
           const result = response
           console.log('getDisobeyListApi result:', result)
+          if (result.code === 200) {
+            resolve(result)
+          } else {
+            reject(result)
+          }
+        }).catch(error => {
+          reject(error)
+        })
+      })
+    },
+    getDormByOtherApi ({ commit }, params) {
+      return new Promise((resolve, reject) => {
+        getDormByOther(params).then(response => {
+          const result = response
+          console.log('getDormByOtherApi result:', result)
+          if (result.code === 200) {
+            resolve(result)
+          } else {
+            reject(result)
+          }
+        }).catch(error => {
+          reject(error)
+        })
+      })
+    },
+    ammeterPayApi ({ commit }, params) {
+      return new Promise((resolve, reject) => {
+        ammeterPay(params).then(response => {
+          const result = response
+          console.log('ammeterPayApi result:', result)
+          if (result.code === 200) {
+            resolve(result)
+          } else {
+            reject(result)
+          }
+        }).catch(error => {
+          reject(error)
+        })
+      })
+    },
+    getPayRecordApi () {
+      return new Promise((resolve, reject) => {
+        getPayRecord().then(response => {
+          const result = response
+          console.log('getPayRecordApi result:', result)
+          if (result.code === 200) {
+            resolve(result)
+          } else {
+            reject(result)
+          }
+        }).catch(error => {
+          reject(error)
+        })
+      })
+    },
+    eleSearchApi (params) {
+      return new Promise((resolve, reject) => {
+        eleSearch(params).then(response => {
+          const result = response
+          console.log('eleSearchApi result:', result)
           if (result.code === 200) {
             resolve(result)
           } else {

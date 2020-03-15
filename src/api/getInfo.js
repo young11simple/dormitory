@@ -43,6 +43,22 @@ export function getAmmeters () {
   })
 }
 
+export function addAmmeter (params) {
+  return axios({
+    url: '/addAmmeter',
+    method: 'post',
+    data: params
+  })
+}
+
+export function delAmmeter (params) {
+  return axios({
+    url: '/delAmmeter',
+    method: 'post',
+    data: params
+  })
+}
+
 export function getDormById (params) {
   return axios({
     url: '/getDormById',
@@ -62,6 +78,34 @@ export function addDisobey (params) {
 export function getDisobeyList (params) {
   return axios({
     url: '/getDisobeyList',
+    method: 'post',
+    data: params
+  })
+}
+
+export function getDormByOther (params) {
+  return axios({
+    url: '/getDormByOther',
+    method: 'post',
+    data: params
+  })
+}
+export function ammeterPay (params) {
+  return axios({
+    url: '/ammeterPay',
+    method: 'post',
+    data: params
+  })
+}
+export function getPayRecord () {
+  return axios({
+    url: '/getPayRecord',
+    method: 'post'
+  })
+}
+export function eleSearch (params) {
+  return axios({
+    url: '/eleSearch',
     method: 'post',
     data: params
   })
