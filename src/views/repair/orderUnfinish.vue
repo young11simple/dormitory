@@ -1,41 +1,17 @@
 <template>
   <div id="components-form-order">
+    <div style="margin-bottom:10px">
+      <a-button type="primary" @click="handleGet" style="margin-right:20px">完成订单</a-button>
+      <a-button type="primary" @click="handleFail">失败处理</a-button>
+    </div>
     <a-table
       :columns="columns"
       :dataSource="data"
       :pagination="pagination"
       rowKey="repairId"
+      :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
       bordered
     >
-      <template
-        v-for="col in ['repairTime', 'result']"
-        :slot="col"
-        slot-scope="text, record"
-      >
-        <div :key="col">
-          <a-input
-            v-if="record.editable"
-            style="margin: -5px 0"
-            :value="text"
-            @change="e => handleChange(e.target.value, record.repairId, col)"
-          />
-          <template v-else>{{ text }}</template>
-        </div>
-      </template>
-      <template slot="operation" slot-scope="text, record">
-        <div class="editable-row-operations">
-          <span v-if="record.editable">
-            <a @click="() => save(record.repairId)">保存</a>
-            <a-popconfirm title="确定取消?" @confirm="() => cancel(record.repairId)">
-              <a>取消</a>
-            </a-popconfirm>
-          </span>
-          <span v-else>
-            <a-button @click="() => edit(record.repairId)" style="margin-right:10px">编辑</a-button>
-            <a-button :disabled="record.disable" @click="() => done(record)">完成</a-button>
-          </span>
-        </div>
-      </template>
     </a-table>
   </div>
 </template>
@@ -44,16 +20,12 @@ import store from '@/store'
 import { mapActions } from 'vuex'
 const columns = [
   {
-    title: '订单号',
+    title: '报修单号',
     dataIndex: 'repairId'
   },
   {
     title: '报修者',
     dataIndex: 'name'
-  },
-  {
-    title: '联系电话',
-    dataIndex: 'telephone'
   },
   {
     title: '宿舍号',
@@ -70,21 +42,6 @@ const columns = [
   {
     title: '申请时间',
     dataIndex: 'time'
-  },
-  {
-    title: '维修时间',
-    dataIndex: 'repairTime',
-    scopedSlots: { customRender: 'repairTime' }
-  },
-  {
-    title: '维修结果',
-    dataIndex: 'result',
-    scopedSlots: { customRender: 'result' }
-  },
-  {
-    title: '操作',
-    dataIndex: 'operation',
-    scopedSlots: { customRender: 'operation' }
   }
 ]
 export default {
@@ -98,61 +55,123 @@ export default {
         pageSizeOptions: ['5', '10', '15', '20'],
         showQuickJumper: true
       },
-      columns
+      columns,
+      selectedRowKeys: [],
+      selectedData: []
     }
   },
   methods: {
-    ...mapActions(['getRepairListApi', 'getDormByIdApi']),
-    handleChange (value, key, column) {
-      const newData = [...this.data]
-      const target = newData.filter(item => key === item.repairId)[0]
-      if (target) {
-        target[column] = value
-        this.data = newData
+    ...mapActions(['getRepairListApi', 'getDormByIdApi', 'repairDoneApi']),
+    onSelectChange (selectedRowKeys) {
+      console.log('selectedRowKeys', selectedRowKeys)
+      this.selectedRowKeys = selectedRowKeys
+    },
+    handleGet () {
+      const that = this
+      if (!this.hasSelected) {
+        this.$confirm({
+          title: '提示',
+          content: h => <div>确认成功受理全部订单吗</div>,
+          onOk () {
+            that.selectedData = that.data.map(item => item.repairId)
+            console.log('params1', that.selectedData)
+            const params = { repairIds: that.selectedData, process: 2 }
+            that.selectedData = []
+            that.repairDoneApi(params).then(res => {
+              that.data = []
+              that.$notification.success({
+                message: '成功',
+                description: '受理成功',
+                duration: 2
+              })
+            })
+              .catch(err => console.log(err))
+              .finally()
+          },
+          onCancel () {
+            console.log('Cancel')
+          }
+        })
+      } else {
+        const s = new Set(this.selectedRowKeys)
+        // this.selectedData = this.data.filter(item => s.has(item.repairId))
+        const params = { repairIds: that.selectedRowKeys, process: 2 }
+        console.log('params2', params)
+        that.selectedRowKeys = []
+        this.repairDoneApi(params).then(res => {
+          this.data = this.data.filter(item => !s.has(item.repairId))
+          this.$notification.success({
+            message: '成功',
+            description: '受理成功',
+            duration: 2
+          })
+        })
+          .catch(err => console.log(err))
+          .finally()
       }
     },
-    edit (key) {
-      const newData = [...this.data]
-      const target = newData.filter(item => key === item.repairId)[0]
-      if (target) {
-        target.editable = true
-        this.data = newData
+    handleFail () {
+      const that = this
+      if (!this.hasSelected) {
+        this.$confirm({
+          title: '提示',
+          content: h => <div>确认失败受理全部订单吗</div>,
+          onOk () {
+            that.selectedData = that.data.map(item => item.repairId)
+            console.log('params1', that.selectedData)
+            const params = { repairIds: that.selectedData, process: -1 }
+            that.selectedData = []
+            that.repairDoneApi(params).then(res => {
+              that.data = []
+              that.$notification.success({
+                message: '成功',
+                description: '受理成功',
+                duration: 2
+              })
+            })
+              .catch(err => console.log(err))
+              .finally()
+          },
+          onCancel () {
+            console.log('Cancel')
+          }
+        })
+      } else {
+        const s = new Set(this.selectedRowKeys)
+        // this.selectedData = this.data.filter(item => s.has(item.repairId))
+        const params = { repairIds: that.selectedRowKeys, process: -1 }
+        that.selectedRowKeys = []
+        console.log('params2', params)
+        this.repairDoneApi(params).then(res => {
+          this.data = this.data.filter(item => !s.has(item.repairId))
+          this.$notification.success({
+            message: '成功',
+            description: '受理成功',
+            duration: 2
+          })
+        })
+          .catch(err => console.log(err))
+          .finally()
       }
-    },
-    save (key) {
-      this.cacheData = this.data.map(item => ({ ...item }))
-      const newData = [...this.data]
-      const newCacheData = [...this.cacheData]
-      const target = newData.filter(item => key === item.repairId)[0]
-      const targetCache = newCacheData.filter(item => key === item.repairId)[0]
-      if (target && targetCache) {
-        delete target.editable
-        this.data = newData
-        Object.assign(targetCache, target)
-        this.cacheData = newCacheData
-      }
-      if (target.repairTime && target.result) {
-        target.disable = false
-      }
-    },
-    cancel (key) {
-      const newData = [...this.data]
-      const target = newData.filter(item => key === item.repairId)[0]
-      if (target) {
-        Object.assign(target, this.cacheData.filter(item => key === item.repairId)[0])
-        delete target.editable
-        this.data = newData
-      }
-    },
-    done (item) {
-      this.data = this.data.filter(items => items.repairId !== item.repairId)
-      this.$notification['success']({
-        message: '消息提示',
-        description:
-          '该订单已成功处理'
-      })
     },
     handleScuccessfully (res) {
+      const datas = res.data.repairInfo
+      datas.forEach(element => {
+        element.time = element.time.replace(/T/, ' ').slice(0, element.time.indexOf('.'))
+        const jsonData2 = { dormId: element.dormId }
+        this.getDormByIdApi(jsonData2)
+          .then(res => {
+            element.address = res.area + res.buildId + '-' + res.roomId
+            this.data.push(element)
+          })
+          .catch(err => { console.log('err:', err) })
+          .finally()
+      })
+    }
+  },
+  computed: {
+    hasSelected () {
+      return this.selectedRowKeys.length > 0
     }
   },
   mounted () {

@@ -1,5 +1,5 @@
 // eslint-disable-next-line
-import { UserLayout, BasicLayout, RouteView, BlankLayout, PageView } from '@/layouts'
+import { UserLayout, BasicLayout, RouteView, BlankLayout } from '@/layouts'
 
 export const adminRouterMap = [
   {
@@ -7,7 +7,7 @@ export const adminRouterMap = [
     name: 'index',
     component: BasicLayout,
     meta: { title: '首页' },
-    redirect: '/pay/eleTotal',
+    redirect: '/management/dormInfo',
     children: [
       // studentInfo
       // {
@@ -31,28 +31,6 @@ export const adminRouterMap = [
       //     }
       //   ]
       // },
-      // pay
-      {
-        path: '/pay',
-        name: 'pay',
-        redirect: '/pay/eleTotal',
-        component: RouteView,
-        meta: { title: '电网信息', keepAlive: true, icon: 'property-safety' },
-        children: [
-          {
-            path: '/pay/eleTotal',
-            name: 'eleTotal',
-            component: () => import('@/views/pay/adEleCheck'),
-            meta: { title: '用电信息', keepAlive: false }
-          },
-          {
-            path: '/pay/eleTotalAnalyse',
-            name: 'eleTotalAnalyse',
-            component: () => import('@/views/pay/eleTotalAnalyse'),
-            meta: { title: '用电统计', keepAlive: false }
-          }
-        ]
-      },
       // management
       {
         path: '/management',
@@ -72,6 +50,12 @@ export const adminRouterMap = [
             name: 'allocation',
             component: () => import('@/views/management/allocation'),
             meta: { title: '学生宿舍分配', keepAlive: true }
+          },
+          {
+            path: '/management/cancellation',
+            name: 'cancellation',
+            component: () => import('@/views/management/cancellation'),
+            meta: { title: '注销学生信息', keepAlive: true }
           }
         ]
       },
@@ -103,22 +87,44 @@ export const adminRouterMap = [
           }
         ]
       },
-      // employee
+      // pay
       {
-        path: '/worker',
-        name: 'worker',
-        redirect: '/worker/wokerInfo',
+        path: '/pay',
+        name: 'pay',
+        redirect: '/pay/eleTotal',
         component: RouteView,
-        meta: { title: '员工管理', keepAlive: true, icon: 'solution' },
+        meta: { title: '电网信息', keepAlive: true, icon: 'property-safety' },
         children: [
           {
-            path: '/worker/wokerInfo',
-            name: 'wokerInfo',
-            component: () => import('@/views/worker/workerInfo'),
-            meta: { title: '员工信息', keepAlive: false }
+            path: '/pay/eleTotal',
+            name: 'eleTotal',
+            component: () => import('@/views/pay/adEleCheck'),
+            meta: { title: '用电信息', keepAlive: false }
           }
+          // {
+          //   path: '/pay/eleTotalAnalyse',
+          //   name: 'eleTotalAnalyse',
+          //   component: () => import('@/views/pay/eleTotalAnalyse'),
+          //   meta: { title: '用电统计', keepAlive: false }
+          // }
         ]
       },
+      // employee
+      // {
+      //   path: '/worker',
+      //   name: 'worker',
+      //   redirect: '/worker/wokerInfo',
+      //   component: RouteView,
+      //   meta: { title: '员工管理', keepAlive: true, icon: 'solution' },
+      //   children: [
+      //     {
+      //       path: '/worker/wokerInfo',
+      //       name: 'wokerInfo',
+      //       component: () => import('@/views/worker/workerInfo'),
+      //       meta: { title: '员工信息', keepAlive: false }
+      //     }
+      //   ]
+      // },
       // account
       {
         path: '/account',
@@ -173,12 +179,6 @@ export const studentRouterMap = [
             component: () => import('@/views/pay/eleSearch'),
             meta: { title: '用电查询', keepAlive: false }
           },
-          // {
-          //   path: '/pay/refund',
-          //   name: 'refund',
-          //   component: () => import('@/views/pay/refund'),
-          //   meta: { title: '电表退费', keepAlive: false, permission: ['pay'] }
-          // },
           {
             path: '/pay/paySearch',
             name: 'paySearch',
@@ -205,7 +205,7 @@ export const studentRouterMap = [
             path: '/repair/showProgress',
             name: 'showProgress',
             component: () => import('@/views/repair/showProgress'),
-            meta: { title: '查看进度', keepAlive: false }
+            meta: { title: '报修记录', keepAlive: false }
           }
         ]
       },
@@ -214,14 +214,20 @@ export const studentRouterMap = [
         path: '/news',
         name: 'news',
         component: RouteView,
-        redirect: '/news/showNews',
+        redirect: '/news/disobeyNews',
         meta: { title: '相关消息', icon: 'mail', keepAlive: true },
         children: [
           {
-            path: '/news/showNews',
-            name: 'showNews',
-            component: () => import('@/views/repair/apply'),
-            meta: { title: '相关消息', keepAlive: false }
+            path: '/news/disobeyNews',
+            name: 'disobeyNews',
+            component: () => import('@/views/studentInfo/disobeyNews'),
+            meta: { title: '违纪消息', keepAlive: false }
+          },
+          {
+            path: '/news/checkNews',
+            name: 'checkNews',
+            component: () => import('@/views/studentInfo/checkNews'),
+            meta: { title: '卫生结果消息', keepAlive: false }
           }
         ]
       },

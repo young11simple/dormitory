@@ -1,20 +1,15 @@
 <template>
   <div id="components-form-dorm">
     <a-table
-      :pagination="pagination"
+      slot="expandedRowRender"
       :columns="columns"
       :dataSource="data"
-      :expandedRowKeys="expandedRowKeys"
-      @expand="expand"
+      :pagination="pagination"
       bordered
     >
-      <a-table
-        slot="expandedRowRender"
-        :columns="innerColumns"
-        :dataSource="innerDatas"
-        :pagination="false"
-      ></a-table>
-    </a-table>
+      <template slot="operation" slot-scope="text,record">
+        <a-button type="primary" @click="()=>cancel(record.userId)" >注销</a-button>
+      </template></a-table>
   </div>
 </template>
 <script>
@@ -26,20 +21,6 @@ const columns = [
     dataIndex: 'roomId'
   },
   {
-    title: '床位',
-    dataIndex: 'bed'
-  },
-  {
-    title: '是否有空铺位',
-    dataIndex: 'hasEmpty'
-  },
-  {
-    title: '空铺数',
-    dataIndex: 'lastbed'
-  }
-]
-const innerColumns = [
-  {
     title: '姓名',
     dataIndex: 'name'
   },
@@ -50,10 +31,6 @@ const innerColumns = [
   {
     title: '性别',
     dataIndex: 'gender'
-  },
-  {
-    title: '联系方式',
-    dataIndex: 'telephone'
   },
   {
     title: '院系',
@@ -68,19 +45,17 @@ const innerColumns = [
     dataIndex: 'classId'
   },
   {
-    title: '级别',
-    dataIndex: 'level'
+    title: '操作',
+    dataIndex: 'operation',
+    scopedSlots: { customRender: 'operation' }
   }
 ]
 export default {
   data () {
     return {
       columns,
-      innerColumns,
       data: [],
       innerData: [],
-      innerDatas: [],
-      expandedRowKeys: [],
       pagination: {
         defaultPageSize: 5,
         showTotal: total => `共 ${total} 条数据`,
@@ -92,48 +67,39 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['getDormsApi', 'getDormByIdApi', 'getUsersByDormApi']),
-    expand (expanded, record) {
-      if (expanded) {
-        // 初始化展开值
-        this.innerDatas = []
-        // 初始化关闭所有展开窗
-        this.expandedRowKeys = []
-        // 设置展开参数
-        this.innerDatas = this.innerData[record.key]
-        // 设置展开窗Key
-        this.onExpandedRowsChange(record)
-      } else {
-        this.expandedRowKeys = []
-      }
-    },
-    onExpandedRowsChange (rows) {
-      this.expandedRowKeys = [rows.key]
-    },
+    ...mapActions(['getDormsApi', 'getDormByIdApi', 'getUsersByDormApi', 'logoffStudentApi']),
     handleInnerData (element) {
       this.getUsersByDormApi({ dormId: element.dormId }).then(res => {
         console.log('getInfo res', res)
-        const arr = []
         res.data.users.forEach(ele => {
-          ele.key = arr.length
-          arr.push(ele)
+          ele.key = this.data.length
+          this.data.push(ele)
         })
-        this.innerData.push(arr)
       })
         .catch(err => console.log('getInfo err', err))
+    },
+    cancel (userId) {
+      this.logoffStudentApi({ userId: userId }).then(res => {
+        console.log(res)
+        this.$notification.success({
+          message: '成功',
+          description: '注销成功'
+        })
+        this.data = this.data.filter(item => item.userId !== userId)
+      })
+        .catch(err => {
+          console.log(err)
+          this.$notification.error({
+            message: '失败',
+            description: '注销失败'
+          })
+        })
     }
   },
   mounted () {
     const jsonData = { area: store.getters.userInfo.area, buildId: store.getters.userInfo.buildId }
     this.getDormsApi(jsonData).then(res => {
       res.data.dorms.forEach(element => {
-        element.key = this.data.length
-        if (element.lastbed > 0) {
-          element.hasEmpty = '是'
-        } else {
-          element.hasEmpty = '否'
-        }
-        this.data.push(element)
         this.handleInnerData(element)
       })
     })

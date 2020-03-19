@@ -32,24 +32,32 @@
                 { rules: [{ required: true, message: '请选择信息' }] },
               ]"
               placeholder="请选择信息">
-              <a-select-option key="女">女</a-select-option>
-              <a-select-option key="男">男</a-select-option>
+              <a-select-option key="是">是</a-select-option>
+              <a-select-option key="否">否</a-select-option>
             </a-select>
           </a-form-item>
         </a-col>
         <a-col :key="6" :span="6">
           <a-form-item label="来访时间">
-            <a-date-picker showTime placeholder="选择时间" v-decorator="['startTime', config]" format="YYYY-MM-DD HH:mm:ss"/>
+            <a-date-picker showTime placeholder="选择时间" v-decorator="['arriveTime', config]" format="YYYY-MM-DD HH:mm:ss"/>
           </a-form-item>
         </a-col>
         <a-col :key="7" :span="6">
           <a-form-item label="离开时间">
-            <a-date-picker showTime placeholder="选择时间" v-decorator="['endTime', config]" format="YYYY-MM-DD HH:mm:ss"/>
+            <a-date-picker showTime placeholder="选择时间" v-decorator="['leaveTime', config]" format="YYYY-MM-DD HH:mm:ss"/>
           </a-form-item>
         </a-col>
-      </a-row>
-      <a-row>
-        <a-col :span="24" :style="{ textAlign: 'right' }">
+        <a-col :key="8" :span="8">
+          <a-form-item label="备注" style="display:flex">
+            <a-input
+              v-decorator="[
+                'other',
+                { rules: [{ required: true, message: '请填写备注' }] },
+              ]"
+              placeholder="有则写，无则写无"/>
+          </a-form-item>
+        </a-col>
+        <a-col :span="16" :style="{ textAlign: 'right' }">
           <a-button type="primary" html-type="submit">
             添加
           </a-button>
@@ -76,30 +84,28 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
+import store from '@/store'
 const columns = [
   {
     title: '来访者',
-    dataIndex: 'userName',
-    width: '8%',
-    scopedSlots: { customRender: 'userName' }
+    dataIndex: 'vname',
+    width: '8%'
   },
   {
     title: '被访者',
     dataIndex: 'name',
-    width: '8%',
-    scopedSlots: { customRender: 'name' }
+    width: '8%'
   },
   {
     title: '关系',
     dataIndex: 'relation',
-    width: '8%',
-    scopedSlots: { customRender: 'relation' }
+    width: '8%'
   },
   {
     title: '是否本校',
     dataIndex: 'isSCAU',
-    width: '9%',
-    scopedSlots: { customRender: 'isSCAU' }
+    width: '9%'
   },
   {
     title: '证件号码',
@@ -109,21 +115,21 @@ const columns = [
   },
   {
     title: '访问时间',
-    dataIndex: 'startTime',
+    dataIndex: 'arriveTime',
     width: '12%',
-    scopedSlots: { customRender: 'startTime' }
+    scopedSlots: { customRender: 'arriveTime' }
   },
   {
     title: '离开时间',
-    dataIndex: 'endTime',
+    dataIndex: 'leaveTime',
     width: '12%',
     scopedSlots: { customRender: 'endTime' }
   },
   {
-    title: '操作',
-    dataIndex: 'operation',
+    title: '备注',
+    dataIndex: 'other',
     width: '10%',
-    scopedSlots: { customRender: 'operation' }
+    scopedSlots: { customRender: 'other' }
   }
 ]
 export default {
@@ -140,19 +146,21 @@ export default {
       },
       visitorInfo: {},
       items: [
-        { value: '来访者', name: 'name', place: '来访者姓名' },
+        { value: '来访者', name: 'vname', place: '来访者姓名' },
         { value: '证件号', name: 'idNo', place: '来访者证件号码' },
-        { value: '被访者', name: 'userName', place: '被访者姓名' },
-        { value: '宿舍号', name: 'address', place: '被访者宿舍地址' },
+        { value: '被访者', name: 'name', place: '被访者姓名' },
+        { value: '宿舍号', name: 'roomId', place: '被访者宿舍地址' },
         { value: '所属关系', name: 'relation', place: '与被访者关系' }
       ],
       config: {
         rules: [{ type: 'object', required: true, message: '请选择选项!' }]
       },
-      form: this.$form.createForm(this, { name: 'advanced_apply' })
+      form: this.$form.createForm(this, { name: 'advanced_apply' }),
+      selfInfo: {}
     }
   },
   methods: {
+    ...mapActions(['addVisitApi', 'getVisitRecordsApi']),
     handleDelete (key) {
       console.log('key', key)
       this.data = this.data.filter(item => item.key !== key)
@@ -165,27 +173,29 @@ export default {
         } else {
           const values = {
             ...fieldsValue,
-            'startTime': fieldsValue['startTime'].format('YYYY-MM-DD HH:mm:ss'),
-            'endTime': fieldsValue['endTime'].format('YYYY-MM-DD HH:mm:ss')
+            'arriveTime': fieldsValue['arriveTime'].format('YYYY-MM-DD HH:mm:ss'),
+            'leaveTime': fieldsValue['leaveTime'].format('YYYY-MM-DD HH:mm:ss')
           }
-          values.key = this.data.length
+          values.area = this.selfInfo.area
+          values.buildId = this.selfInfo.buildId
           console.log('Received values of form: ', values)
-          this.data.push(values)
-          // repairApplyApi(values)
-          //   .then(res => this.handleSuccessfully(res))
-          //   .catch(err => this.handleFail(err))
-          //   .finally()
+          this.addVisitApi(values)
+            .then(res => this.handleSuccessfully(res, values))
+            .catch(err => this.handleFail(err))
+            .finally()
         }
       })
     },
     handleReset () {
       this.form.resetFields()
     },
-    handleSuccessfully (res) {
-      console.log('apply successfully', res)
+    handleSuccessfully (res, values) {
+      console.log('addVisitor successfully', res)
+      values.key = this.data.length
+      this.data.push(values)
       this.$notification['success']({
         message: '成功',
-        description: '报修成功',
+        description: '添加成功',
         duration: 2
       })
     },
@@ -193,10 +203,25 @@ export default {
       console.log('apply fail', err)
       this.$notification['error']({
         message: '错误',
-        description: '报修失败，请稍后再试',
+        description: '添加失败，请稍后再试',
         duration: 2
       })
     }
+  },
+  mounted () {
+    this.selfInfo.buildId = store.getters.userInfo.buildId
+    this.selfInfo.area = store.getters.userInfo.area
+    const jsonData = { area: this.selfInfo.area, buildId: this.selfInfo.buildId }
+    this.getVisitRecordsApi(jsonData).then(res => {
+      const arr = res.data.visits
+      arr.forEach(ele => {
+        ele.arriveTime = ele.arriveTime.replace(/T/, ' ').slice(0, ele.arriveTime.indexOf('.'))
+        ele.leaveTime = ele.leaveTime.replace(/T/, ' ').slice(0, ele.leaveTime.indexOf('.'))
+        ele.key = this.data.length
+        this.data.push(ele)
+      })
+    })
+      .catch(err => console.log(err))
   }
 }
 </script>

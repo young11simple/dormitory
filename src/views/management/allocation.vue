@@ -1,337 +1,237 @@
 <template>
-  <div id="components-form-allocation">
-    <div id="tooltip">
-      <!-- <a-button type="primary" @click="randomAllocate" :style="{marginRight:'30px'}">随机分配</a-button> -->
-      <!-- <a-button
-        type="primary"
-        @click="handAllocate"
-        v-if="!isRandom"
-        :style="{marginRight:'30px'}"
-      >人工分配</a-button> -->
-      <!-- <a-button type="primary" v-if="isRandom">导入学生信息</a-button> -->
+  <div id="components-form-dorm">
+    <div id="tooltip" style="margin-bottom:10px">
       <import-data @getResult="getResult"></import-data>
+      <span>（导入学生数量不得多于{{ count }}个）</span>
       <a-button type="primary" @click="export2Excel">导出学生信息</a-button>
     </div>
     <a-table
       :pagination="pagination"
       :columns="columns"
       :dataSource="data"
+      :expandedRowKeys="expandedRowKeys"
+      @expand="expand"
       bordered
-      id="table"
     >
-      <!-- <a-table
+      <a-table
         slot="expandedRowRender"
         :columns="innerColumns"
-        :dataSource="innerDatas[setIndex]"
+        :dataSource="innerDatas"
         :pagination="false"
-      ></a-table>-->
+      ></a-table>
     </a-table>
   </div>
 </template>
 <script>
+import { mapActions } from 'vuex'
+import store from '@/store'
 import importData from './importData'
 import XLSX from 'xlsx'
-// const columns = [
-//   {
-//     title: '宿舍号',
-//     dataIndex: 'roomID',
-//     width: '30%'
-//   },
-//   {
-//     title: '几人间',
-//     dataIndex: 'count',
-//     width: '30%'
-//   },
-//   {
-//     title: '空铺数',
-//     dataIndex: 'countEmpty',
-//     width: '30%'
-//   }
-// ]
-// const innerColumns = [
-//   {
-//     title: '姓名',
-//     dataIndex: 'name',
-//     width: '10%'
-//   },
-//   {
-//     title: '学号',
-//     dataIndex: 'account',
-//     width: '10%'
-//   },
-//   {
-//     title: '性别',
-//     dataIndex: 'gender',
-//     width: '7%'
-//   },
-//   {
-//     title: '联系方式',
-//     dataIndex: 'contact',
-//     width: '10%'
-//   },
-//   {
-//     title: '院系',
-//     dataIndex: 'college',
-//     width: '15%'
-//   },
-//   {
-//     title: '专业班级',
-//     dataIndex: 'majorClass',
-//     width: '10%'
-//   },
-//   {
-//     title: '级别',
-//     dataIndex: 'level',
-//     width: '10%'
-//   }
-// ]
+const columns = [
+  {
+    title: '宿舍号',
+    dataIndex: 'roomId'
+  },
+  {
+    title: '床位',
+    dataIndex: 'bed'
+  },
+  {
+    title: '是否有空铺位',
+    dataIndex: 'hasEmpty'
+  },
+  {
+    title: '空铺数',
+    dataIndex: 'lastbed'
+  }
+]
+const innerColumns = [
+  {
+    title: '姓名',
+    dataIndex: 'name'
+  },
+  {
+    title: '学号',
+    dataIndex: 'userId'
+  },
+  {
+    title: '性别',
+    dataIndex: 'gender'
+  },
+  {
+    title: '联系方式',
+    dataIndex: 'telephone'
+  },
+  {
+    title: '院系',
+    dataIndex: 'college'
+  },
+  {
+    title: '专业',
+    dataIndex: 'major'
+  },
+  {
+    title: '班级',
+    dataIndex: 'classId'
+  },
+  {
+    title: '级别',
+    dataIndex: 'level'
+  }
+]
 const data = []
-// let innerData = []
-// const innerDatas = []
-for (let i = 0; i < 4; i++) {
-  var k = i * 4
-  data.push({
-    key: k.toString(),
-    roomID: i.toString(),
-    count: '4',
-    countEmpty: '3',
-    name: `Edrward ${i}`,
-    account: `20162505020${i}`,
-    gender: '女',
-    contact: `1580203356${i}`,
-    college: '数学与信息学院',
-    majorClass: '网工2班',
-    level: '2016级'
-  })
-  if (data[i].count > data[i].countEmpty) {
-    const tmp = data[i].countEmpty
-    console.log('空床位', tmp)
-    for (let j = 1; j < 4; j++) {
-      data.push({
-        key: (++k).toString(),
-        roomID: i.toString(),
-        count: '4',
-        countEmpty: '3'
-      })
-    }
-  }
-}
-console.log('data', data)
-// for (let i = 0; i < 10; i++) {
-//   innerData.push({
-//     name: `Edrward ${i}`,
-//     account: `20162505020${i}`,
-//     gender: '女',
-//     contact: `1580203356${i}`,
-//     college: '数学与信息学院',
-//     majorClass: '网工2班',
-//     level: '2016级'
-//   })
-// console.log('innerData:', innerData)
-//   if (i % 2 === 1) {
-//     innerDatas.push(innerData)
-//     innerData = []
-//     console.log('innerDatas:', innerDatas)
-//   }
-// }
-const renderContent2 = (value, row, index) => {
-  const obj = {
-    children: value,
-    attrs: {}
-  }
-  return obj
-}
-const renderContent = (value, row, index) => {
-  const obj = {
-    children: value,
-    attrs: {}
-  }
-  if (index % 4 === 0) {
-    obj.attrs.rowSpan = 4
-  } else {
-    obj.attrs.rowSpan = 0
-  }
-  return obj
-}
+var count = 0
 export default {
   components: {
     importData
   },
   data () {
-    const columns = [
-      {
-        title: '宿舍号',
-        dataIndex: 'roomID',
-        width: '10%',
-        customRender: renderContent
-      },
-      {
-        title: '人数',
-        dataIndex: 'count',
-        width: '6%',
-        customRender: renderContent
-      },
-      {
-        title: '空铺',
-        dataIndex: 'countEmpty',
-        width: '6%',
-        customRender: renderContent
-      },
-      {
-        title: '姓名',
-        dataIndex: 'name',
-        width: '10%',
-        customRender: renderContent2
-      },
-      {
-        title: '学号',
-        dataIndex: 'account',
-        width: '10%',
-        customRender: renderContent2
-      },
-      {
-        title: '性别',
-        dataIndex: 'gender',
-        width: '7%',
-        customRender: renderContent2
-      },
-      {
-        title: '联系方式',
-        dataIndex: 'contact',
-        width: '10%',
-        customRender: renderContent2
-      },
-      {
-        title: '院系',
-        dataIndex: 'college',
-        width: '15%',
-        customRender: renderContent2
-      },
-      {
-        title: '专业班级',
-        dataIndex: 'majorClass',
-        width: '10%',
-        customRender: renderContent2
-      },
-      {
-        title: '级别',
-        dataIndex: 'level',
-        width: '10%',
-        customRender: renderContent2
-      }
-    ]
     return {
+      count,
       columns,
-      // innerColumns,
+      innerColumns,
       data,
-      // innerDatas,
+      expandedRowKeys: [],
+      innerData: [],
+      innerDatas: [],
       pagination: {
-        defaultPageSize: 4,
+        defaultPageSize: 5,
         showTotal: total => `共 ${total} 条数据`,
         showSizeChanger: true,
-        pageSizeOptions: ['4', '8', '12', '16'],
+        pageSizeOptions: ['5', '10', '15', '20'],
         showQuickJumper: true
       },
+      newUsers: [],
       rooms: [],
-      isRandom: false,
-      setIndex: -1,
       studentsInfo: []
     }
   },
-  computed: {
-    info () {
-      return this.studentsInfo
-    }
-  },
-  watch: {
-    info (val) {
-      console.log('watch', val)
-      let i, j
-      for (i = 0, j = 0; i < this.data.length; i++) {
-        console.log('this.data[i].name', this.data[i].name)
-        if (j === val.length) {
-          break
-        } else {
-          if (this.data[i].name === undefined) {
-            console.log('JSON.parse(val[j])', val[j])
-            if (i % 4 === 3) {
-              this.data[i - 3].countEmpty = 0
-              this.data[i - 2].countEmpty = 0
-              this.data[i - 1].countEmpty = 0
-              this.data[i].countEmpty = 0
-            } else if (i % 4 === 2) {
-              this.data[i - 2].countEmpty = 1
-              this.data[i - 1].countEmpty = 1
-              this.data[i].countEmpty = 1
-              this.data[i + 1].countEmpty = 1
-            } else if (i % 4 === 1) {
-              this.data[i - 1].countEmpty = 2
-              this.data[i].countEmpty = 2
-              this.data[i + 1].countEmpty = 2
-              this.data[i + 2].countEmpty = 2
-            } else {
-              this.data[i].countEmpty = 3
-              this.data[i + 1].countEmpty = 3
-              this.data[i + 2].countEmpty = 3
-              this.data[i + 3].countEmpty = 3
+  methods: {
+    ...mapActions(['getDormsApi', 'getDormByIdApi', 'getUsersByDormApi', 'addStudentApi']),
+    getResult (values) {
+      this.studentsInfo = JSON.parse(JSON.stringify(values))
+      if (this.studentsInfo.length > this.count) {
+        this.$notification.error({
+          message: '警告',
+          description: '学生数量超过现有空床位'
+        })
+      } else {
+        this.count = this.count - this.studentsInfo.length
+        var k = 0
+        this.data.forEach(ele => {
+          const indexTmp = this.data.indexOf(ele)
+          if (ele.lastbed !== 0) {
+            var arr = []
+            for (let i = 0; i < ele.lastbed && k !== values.length; i++) {
+              const arr2 = {
+                key: this.innerData[indexTmp].length,
+                dormId: ele.dormId,
+                name: this.studentsInfo[k].姓名,
+                userId: this.studentsInfo[k].学号,
+                gender: this.studentsInfo[k].性别,
+                telephone: this.studentsInfo[k].联系方式,
+                college: this.studentsInfo[k].院系,
+                major: this.studentsInfo[k].专业,
+                classId: this.studentsInfo[k].班级,
+                level: this.studentsInfo[k++].级别
+              }
+              arr.push(arr2)
+              this.innerData[indexTmp].push(arr2)
+              this.newUsers.push(arr2)
             }
-            this.data[i].name = this.studentsInfo[j].姓名
-            this.data[i].account = this.studentsInfo[j].学号
-            this.data[i].gender = this.studentsInfo[j].性别
-            this.data[i].contact = this.studentsInfo[j].联系方式
-            this.data[i].college = this.studentsInfo[j].院系
-            this.data[i].majorClass = this.studentsInfo[j].专业班级
-            this.data[i].level = this.studentsInfo[j].级别
-            j++
+          }
+        })
+        for (let j = 0; j < this.innerData.length && this.innerData[j].length !== 0; j++) {
+          console.log(j)
+          this.data[j].lastbed = this.data[j].bed - this.innerData[j].length
+          if (this.innerData[j].length === this.data[j].lastbed) {
+            this.data[j].hasEmpty = '否'
           }
         }
       }
-    }
-  },
-  methods: {
-    randomAllocate () {
-      console.log('randomAllocate')
-      this.isRandom = !this.isRandom
-    },
-    handAllocate () {
-      console.log('handAllocate')
-      // this.innerData.push({})
-      // this.innerData.push({})
-    },
-    handleChange () {
-      this.setIndex += 1
-      console.log('setIndex:', this.setIndex)
-    },
-    getResult (values) {
-      this.studentsInfo = values
-      console.log('getResult', this.studentsInfo.length)
+      console.log('this.newUsers', this.newUsers)
+      this.newUsers.forEach(ele => {
+        delete ele.key
+        this.addStudentApi(ele).then(res => {
+          console.log(res)
+          this.$notification.success({
+            message: '成功',
+            description: '分配宿舍成功'
+          })
+        })
+          .catch(err => console.log(err))
+      })
     },
     export2Excel () {
-      // const table = document.getElementById('table')
-      // const worksheet = XLSX.utils.table_to_sheet(table)
-      // let workbook = XLSX.utils.book_new()
-      // XLSX.utils.book_append_sheet(workbook, worksheet, 'sheet')
-      // // 以上四行也可以直接一行搞定，如果不需要对表格数据进行修改的话
-      // workbook = XLSX.utils.table_to_book(document.getElementById('table'))
-      // XLSX.writeFile(workbook, 'text.xlsx')
-      const header = ['宿舍号', '人数', '空铺', '姓名', '学号', '性别', '联系方式', '院系', '专业班级', '级别']
-      const xlsxName = '9栋宿舍信息'
-      const ws = XLSX.utils.json_to_sheet(this.data, header)
+      this.newUsers = []
+      this.innerData.forEach(ele => {
+        this.newUsers = this.newUsers.concat(ele)
+      })
+      const header = ['宿舍号', '人数', '空铺', '姓名', '学号', '性别', '联系方式', '院系', '专业', '班级', '级别']
+      const xlsxName = store.getters.userInfo.area + store.getters.userInfo.buildId + '栋宿舍信息'
+      const ws = XLSX.utils.json_to_sheet(this.newUsers, header)
       const wb = XLSX.utils.book_new()
       XLSX.utils.book_append_sheet(wb, ws, xlsxName)
       XLSX.writeFile(wb, xlsxName + '.xlsx')
+    },
+    expand (expanded, record) {
+      if (expanded) {
+        // 初始化展开值
+        this.innerDatas = []
+        // 初始化关闭所有展开窗
+        this.expandedRowKeys = []
+        // 设置展开参数
+        this.innerDatas = this.innerData[record.key]
+        // 设置展开窗Key
+        this.onExpandedRowsChange(record)
+      } else {
+        this.expandedRowKeys = []
+      }
+    },
+    onExpandedRowsChange (rows) {
+      this.expandedRowKeys = [rows.key]
+    },
+    handleInnerData (element) {
+      this.getUsersByDormApi({ dormId: element.dormId }).then(res => {
+        console.log('getInfo res', res)
+        const arr = []
+        if (res.data.users.length > 0) {
+          res.data.users.forEach(ele => {
+            ele.key = arr.length
+            arr.push(ele)
+          })
+        }
+        this.innerData.unshift(arr)
+        console.log('this.innerData', this.innerData)
+      })
+        .catch(err => console.log('getInfo err', err))
     }
+  },
+  mounted () {
+    const jsonData = { area: store.getters.userInfo.area, buildId: store.getters.userInfo.buildId }
+    this.getDormsApi(jsonData).then(res => {
+      res.data.dorms.forEach(element => {
+        element.key = this.data.length
+        if (element.lastbed > 0) {
+          element.hasEmpty = '是'
+        } else {
+          element.hasEmpty = '否'
+        }
+        this.data.push(element)
+        this.handleInnerData(element)
+        this.count += element.lastbed
+      })
+      console.log('this.data', this.data)
+    })
+      .catch(err => console.log('err', err))
   }
 }
 </script>
 <style scoped>
-#components-form-allocation {
+#components-form-dorm {
   padding: 24px;
   background: #fbfbfb;
   border: 1px solid #d9d9d9;
   border-radius: 6px;
-}
-#tooltip {
-  margin-bottom: 10px;
 }
 </style>

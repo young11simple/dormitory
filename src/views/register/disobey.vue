@@ -1,7 +1,5 @@
 <template>
   <div id="components-form-disobey">
-    <div style="text-align:center"><a-icon type="warning" />{{ selfInfo.area }}{{ selfInfo.buildId }}栋的违纪记录</div>
-    <hr style="align:center; width:300;color:#987cb9; SIZE:1">
     <a-form class="ant-advanced-search-form" :form="form" @submit="handleSubmit">
       <a-row :gutter="24">
         <a-col
@@ -151,19 +149,15 @@ export default {
         rules: [{ type: 'object', required: true, message: '请选择选项!' }]
       },
       form: this.$form.createForm(this, { name: 'advanced_apply' }),
-      selfInfo: {}
+      selfInfo: {},
+      levelArr: ['', '低', '中', '高']
     }
   },
   methods: {
-    ...mapActions(['addDisobeyApi', 'getDisobeyListApi']),
+    ...mapActions(['addDisobeyApi', 'getDisobeyListApi', 'getUserInfoApi']),
     handleDelete (key) {
       console.log('key', key)
       this.data = this.data.filter(item => item.disobeyID !== key)
-    },
-    handleAdd () {
-      console.log('add:', this.disobeyInfo)
-      this.data.unshift(this.disobeyInfo)
-      this.disobeyInfo = {}
     },
     handleSubmit (e) {
       e.preventDefault()
@@ -176,10 +170,14 @@ export default {
             'time': fieldsValue['time'].format('YYYY-MM-DD HH:mm:ss'),
             'level': parseInt(fieldsValue['level'])
           }
-          values.key = this.data.length
           console.log('Received values of form: ', values)
-          this.data.push(values)
-          this.addDisobeyApi(values)
+          const params = {
+            userId: values.userId,
+            level: values.level,
+            reason: values.reason,
+            time: values.time
+          }
+          this.addDisobeyApi(params)
             .then(res => this.handleSuccessfully(res, values))
             .catch(err => this.handleFail(err))
         }
@@ -188,8 +186,17 @@ export default {
     handleReset () {
       this.form.resetFields()
     },
-    handleSuccessfully (res) {
+    handleSuccessfully (res, values) {
       console.log('add successfully', res)
+      this.getUserInfoApi({ userId: values.userId }).then(res => {
+        const tmp = res.data
+        values.info = tmp.college + tmp.major + tmp.classId + '班'
+        values.key = this.data.length
+        values.level = this.levelArr[values.level]
+        console.log('values', values)
+        this.data.unshift(values)
+      })
+        .catch(err => console.log(err))
       this.$notification['success']({
         message: '成功',
         description: '添加成功',
@@ -197,7 +204,7 @@ export default {
       })
     },
     handleFail (err) {
-      console.log('apply fail', err)
+      console.log('add fail', err)
       this.$notification['error']({
         message: '错误',
         description: '添加失败，请稍后再试',
@@ -209,7 +216,21 @@ export default {
     this.selfInfo.buildId = store.getters.userInfo.buildId
     this.selfInfo.area = store.getters.userInfo.area
     const jsonData = { area: this.selfInfo.area, buildId: this.selfInfo.buildId }
-    this.getDisobeyListApi(jsonData).then(res => { console.log(res) })
+    this.getDisobeyListApi(jsonData).then(res => {
+      const items = res.data.disobeyList
+      items.forEach(ele => {
+        const obj = { key: this.data.length,
+          roomId: ele.roomId,
+          userId: ele.userId,
+          name: ele.name,
+          info: ele.college + ele.major + ele.classId + '班',
+          time: ele.time.replace(/T/, ' ').slice(0, ele.time.indexOf('.')),
+          reason: ele.reason,
+          level: this.levelArr[ele.level]
+        }
+        this.data.push(obj)
+      })
+    })
       .catch(err => console.log(err))
   }
 }

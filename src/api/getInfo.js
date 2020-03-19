@@ -33,6 +33,13 @@ export function getRepairList (parameter) {
   })
 }
 
+export function getUserInfo (parameter) {
+  return axios({
+    url: '/getUserInfo',
+    method: 'post',
+    data: parameter
+  })
+}
 /**
  * 获取该用户关联的电表
  */
@@ -90,6 +97,36 @@ export function getDormByOther (params) {
     data: params
   })
 }
+
+export function getDorms (params) {
+  return axios({
+    url: '/getDorms',
+    method: 'post',
+    data: params
+  })
+}
+export function getHygienes (params) {
+  return axios({
+    url: '/getHygienes',
+    method: 'post',
+    data: params
+  })
+}
+export function addHygiene (params) {
+  return axios({
+    url: '/addHygiene',
+    method: 'post',
+    data: params
+  })
+}
+export function getUsersByDorm (params) {
+  return axios({
+    url: '/getUsersByDorm',
+    method: 'post',
+    data: params
+  })
+}
+
 export function ammeterPay (params) {
   return axios({
     url: '/ammeterPay',
@@ -106,6 +143,48 @@ export function getPayRecord () {
 export function eleSearch (params) {
   return axios({
     url: '/eleSearch',
+    method: 'post',
+    data: params
+  })
+}
+export function repairing (params) {
+  return axios({
+    url: '/repairing',
+    method: 'post',
+    data: params
+  })
+}
+export function getVisitRecords (params) {
+  return axios({
+    url: '/getVisitRecords',
+    method: 'post',
+    data: params
+  })
+}
+export function addVisit (params) {
+  return axios({
+    url: '/addVisit',
+    method: 'post',
+    data: params
+  })
+}
+export function repairDone (params) {
+  return axios({
+    url: '/repairDone',
+    method: 'post',
+    data: params
+  })
+}
+export function addStudent (params) {
+  return axios({
+    url: '/addStudent',
+    method: 'post',
+    data: params
+  })
+}
+export function logoffStudent (params) {
+  return axios({
+    url: '/logoffStudent',
     method: 'post',
     data: params
   })

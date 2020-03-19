@@ -27,7 +27,7 @@ const columns = [
   },
   {
     title: '宿舍号',
-    dataIndex: 'address'
+    dataIndex: 'roomId'
   },
   {
     title: '报修类别',
@@ -48,8 +48,8 @@ const columns = [
   },
   {
     title: '维修结果',
-    dataIndex: 'result',
-    scopedSlots: { customRender: 'result' }
+    dataIndex: 'process',
+    scopedSlots: { customRender: 'process' }
   }
 ]
 export default {
@@ -63,12 +63,26 @@ export default {
         showQuickJumper: true
       },
       columns,
-      data: []
+      data: [],
+      result: ['', '', '成功', '失败']
     }
   },
   methods: {
     ...mapActions(['getRepairListApi', 'getDormByIdApi']),
     handleScuccessfully (res) {
+      res.data.repairInfo.forEach(ele => {
+        ele.time = ele.time.replace(/T/, ' ').slice(0, ele.time.indexOf('.'))
+        ele.repairTime = ele.repairTime.replace(/T/, ' ').slice(0, ele.repairTime.indexOf('.'))
+        if (ele.process === -1) ele.process += 4
+        ele.process = this.result[ele.process]
+        const jsonData2 = { dormId: ele.dormId }
+        this.getDormByIdApi(jsonData2)
+          .then(res => {
+            ele.roomId = res.roomId
+            this.data.push(ele)
+          })
+          .catch(err => { console.log('err:', err) })
+      })
     }
   },
   mounted () {
@@ -76,7 +90,10 @@ export default {
     this.getRepairListApi(jsonData)
       .then(res => this.handleScuccessfully(res))
       .catch(err => { console.log('err:', err) })
-      .finally()
+    const jsonData2 = { repairUserId: store.getters.userInfo.userId, process: -1 }
+    this.getRepairListApi(jsonData2)
+      .then(res => this.handleScuccessfully(res))
+      .catch(err => { console.log('err:', err) })
   }
 }
 </script>

@@ -9,7 +9,7 @@
         </a-col>
         <a-col :span="8">
           <a-form-item label="性别">
-            <a-input v-model="gender[userInfo.gender]"/>
+            <a-input v-model="userInfo.gender"/>
           </a-form-item>
         </a-col>
         <a-col :span="8">
@@ -65,7 +65,7 @@ export default {
   created () {
     this.userInfo = store.getters.userInfo
     this.auth = '维修人员'
-    this.workPlace = this.userInfo.workArea + this.userInfo.buildingID + '栋'
+    this.workPlace = this.userInfo.area
   }
 }
 </script>

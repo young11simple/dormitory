@@ -24,7 +24,7 @@
             <a-input
               size="large"
               type="text"
-              placeholder="账户:工号"
+              placeholder="账户:代号"
               v-decorator="[
                 'userId',
                 {rules: [{ required: true, message: '请输入帐户号' }, { validator: handleUsernameOrEmail }], validateTrigger: 'change'}
@@ -86,7 +86,7 @@
             </a-input>
           </a-form-item>
         </a-tab-pane>
-        <a-tab-pane key="tab3" tab="其他">
+        <a-tab-pane key="tab3" tab="维修员">
           <a-alert
             v-if="isLoginError"
             type="error"
@@ -125,14 +125,14 @@
         </a-tab-pane>
       </a-tabs>
 
-      <a-form-item>
+      <!-- <a-form-item>
         <a-checkbox v-decorator="['rememberMe']">自动登录</a-checkbox>
         <router-link
           :to="{ name: 'recover', params: { user: 'aaa'} }"
           class="forge-password"
           style="float: right;"
         >忘记密码</router-link>
-      </a-form-item>
+      </a-form-item> -->
       <a-form-item style="margin-top:24px">
         <a-button
           size="large"

@@ -10,7 +10,7 @@
       <template slot="title">
         <span>导入还未分配床位的学生信息</span>
       </template>
-      <a-button type="primary" @click="btnClick" :style="{marginRight:'30px'}">导入学生信息</a-button>
+      <a-button type="primary" @click="btnClick">导入学生信息</a-button>
     </a-tooltip>
   </span>
 </template>
@@ -18,7 +18,7 @@
 <script>
 import XLSX from 'xlsx'
 export default {
-  name: 'importData',
+  name: 'ImportData',
   methods: {
     btnClick () {
       document.querySelector('.input-file').click()
@@ -51,7 +51,7 @@ export default {
           })
           outdata = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]])
           // 自定义方法向父组件传递数据
-          console.log('outdata = ' + JSON.stringify(outdata))
+          console.log('outdata = ', JSON.parse(JSON.stringify(outdata))[0].姓名)
           that.$emit('getResult', outdata)
         }
         reader.readAsArrayBuffer(f)

@@ -118,7 +118,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['getRepairListApi', 'getDormByIdApi']),
+    ...mapActions(['getRepairListApi', 'getDormByIdApi', 'repairingApi']),
     onSelectChange (selectedRowKeys) {
       console.log('selectedRowKeys', selectedRowKeys)
       this.selectedRowKeys = selectedRowKeys
@@ -129,14 +129,24 @@ export default {
       this.name = store.getters.userInfo.name
     },
     handleGet () {
+      const that = this
       if (!this.hasSelected) {
         this.$confirm({
           title: '提示',
           content: h => <div>确认受理全部订单吗</div>,
           onOk () {
-            console.log('OK')
-            this.selectedData = this.data
-            this.data = []
+            that.selectedData = that.data.map(item => item.repairId)
+            const params = { repairIds: that.selectedData }
+            that.repairingApi(params).then(res => {
+              that.data = []
+              that.$notification.success({
+                message: '成功',
+                description: '受理成功',
+                duration: 2
+              })
+            })
+              .catch(err => console.log(err))
+              .finally()
           },
           onCancel () {
             console.log('Cancel')
@@ -144,13 +154,23 @@ export default {
         })
       } else {
         const s = new Set(this.selectedRowKeys)
-        this.selectedData = this.data.filter(item => s.has(item.repairId))
-        this.data = this.data.filter(item => !s.has(item.repairId))
+        // this.selectedData = this.data.filter(item => s.has(item.repairId))
+        const params = { repairIds: that.selectedRowKeys }
+        this.repairingApi(params).then(res => {
+          this.data = this.data.filter(item => !s.has(item.repairId))
+          this.$notification.success({
+            message: '成功',
+            description: '受理成功',
+            duration: 2
+          })
+        })
+          .catch(err => console.log(err))
+          .finally()
       }
     },
     handleScuccessfully (res) {
-      if (res.size > 0) {
-        const result = res.repairInfo
+      if (res.data.size > 0) {
+        const result = res.data.repairInfo
         result.forEach(element => {
           element.time = element.time.replace(/T/, ' ').slice(0, element.time.indexOf('.'))
           const jsonData2 = { dormId: element.dormId }

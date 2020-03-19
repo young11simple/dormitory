@@ -14,7 +14,7 @@
               <a-radio-button value="30">一个月内</a-radio-button>
               <a-radio-button value="90">三个月内</a-radio-button>
             </a-radio-group>
-            <a-drawer
+            <!-- <a-drawer
               title="用电查询"
               placement="right"
               :closable="false"
@@ -22,9 +22,11 @@
               :visible="visible"
             >
               <p>Some contents...</p>
-            </a-drawer>
+            </a-drawer> -->
           </div>
         </a-collapse-panel>
+        <p v-if="hasRecord" style="margin:10px auto -10px">{{ title }}</p>
+        <dormElect-analyse v-if="hasRecord" :itemsObj="getItems"></dormElect-analyse>
       </a-collapse>
     </div>
   </div>
@@ -33,26 +35,37 @@
 <script>
 import { mapActions } from 'vuex'
 import 'ant-design-vue/lib/collapse/style'
+import dormElectAnalyse from './dormElectAnalyse'
 export default {
+  components: {
+    dormElectAnalyse
+  },
   data () {
     return {
-      // activeKey: ['1'],
       visible: false,
-      Rvalue: '3',
+      Rvalue: '',
       hasAmmeter: true,
       ammeter: [],
-      items: []
+      items: [],
+      hasRecord: false,
+      getItems: [],
+      title: ''
     }
   },
   methods: {
     ...mapActions(['getAmmetersApi', 'eleSearchApi']),
     onChange (index) {
-      this.visible = true
-      // console.log(`checked = ${e.target.value}`)
-      const jsonData2 = { dormId: this.items[index].dormId, days: this.Rvalue }
+      const jsonData2 = { dormId: this.items[index].dormId, days: parseInt(this.Rvalue) }
       console.log(jsonData2)
       this.eleSearchApi(jsonData2).then(res => {
-        console.log(res)
+        const tmp = res.data.records
+        tmp.forEach(ele => {
+          ele.time = ele.time.slice(5, ele.time.length).replace(/-/, '/')
+        })
+        this.getItems = tmp
+        this.title = this.ammeter[index] + '近' + this.Rvalue + '天的用电情况'
+        this.hasRecord = true
+        console.log('this.getItems', this.getItems)
       })
         .catch(err => { console.log('err', err) })
         .finally()
@@ -72,7 +85,6 @@ export default {
       }
     }
   },
-  watch: {},
   mounted () {
     this.getAmmetersApi()
       .then(res => { this.handleSuccess(res) })

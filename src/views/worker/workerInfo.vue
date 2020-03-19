@@ -19,7 +19,7 @@
         </a-col>
       </a-row>
       <a-row :gutter="24">
-          <a-col :span="8">
+        <a-col :span="8">
           <a-form-item label="联系方式" class="formItem">
             <a-input placeholder="员工联系方式" v-model="workerInfo.contact"/>
           </a-form-item>
