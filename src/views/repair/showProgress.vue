@@ -5,23 +5,17 @@
       :dataSource="data"
       :pagination="pagination"
       rowKey="repairId"
+      :expandedRowKeys="expandedRowKeys"
+      @expand="expand"
       bordered
     >
-      <template
-        v-for="col in ['repairTime', 'result']"
-        :slot="col"
-        slot-scope="text, record"
-      >
-        <div :key="col">
-          <a-input
-            v-if="record.editable"
-            style="margin: -5px 0"
-            :value="text"
-            @change="e => handleChange(e.target.value, record.repairId, col)"
-          />
-          <template v-else>{{ text }}</template>
-        </div>
-      </template>
+      <p slot="expandedRowRender" style="margin: 0">
+        <a-steps :current="current" :status="status" size="small">
+          <a-step title="申请提交" />
+          <a-step title="维修人员受理并维修中" />
+          <a-step :title="title" />
+        </a-steps>
+      </p>
     </a-table>
   </div>
 </template>
@@ -77,11 +71,36 @@ export default {
         showQuickJumper: true
       },
       columns,
+      current: 0,
+      status: 'finish',
+      title: '维修成功',
+      expandedRowKeys: [],
       processArr: ['未受理', '维修中', '完成', '失败']
     }
   },
   methods: {
     ...mapActions(['getRepairListApi', 'getDormByIdApi']),
+    expand (expanded, record) {
+      if (expanded) {
+        this.expandedRowKeys = []
+        // 设置展开窗Key
+        this.onExpandedRowsChange(record)
+      } else {
+        this.expandedRowKeys = []
+      }
+    },
+    onExpandedRowsChange (rows) {
+      this.expandedRowKeys.push(rows.repairId)
+      if (rows.process === '失败') {
+        this.current = 2
+        this.status = 'error'
+        this.title = '维修失败'
+      } else {
+        this.current = this.processArr.indexOf(rows.process)
+        this.status = 'finish'
+        this.title = '维修成功'
+      }
+    },
     handleScuccessfully (res) {
       const datas = res.data.repairInfo
       datas.forEach(element => {

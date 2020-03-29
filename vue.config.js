@@ -91,8 +91,7 @@ const vueConfig = {
     proxy: {
       '/api': {
         // target: 'http://localhost:3000/',
-        // target: 'http://114.116.241.229:8080/',
-        target: 'http://m3hriq.natappfree.cc',
+        target: 'http://114.116.241.229:8080',
         ws: true,
         changeOrigin: true,
         pathRewrite: {

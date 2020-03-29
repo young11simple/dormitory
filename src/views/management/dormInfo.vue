@@ -118,6 +118,8 @@ export default {
           ele.key = arr.length
           arr.push(ele)
         })
+        element.key = this.data.length
+        this.data.push(element)
         this.innerData.push(arr)
       })
         .catch(err => console.log('getInfo err', err))
@@ -127,13 +129,11 @@ export default {
     const jsonData = { area: store.getters.userInfo.area, buildId: store.getters.userInfo.buildId }
     this.getDormsApi(jsonData).then(res => {
       res.data.dorms.forEach(element => {
-        element.key = this.data.length
         if (element.lastbed > 0) {
           element.hasEmpty = '是'
         } else {
           element.hasEmpty = '否'
         }
-        this.data.push(element)
         this.handleInnerData(element)
       })
     })

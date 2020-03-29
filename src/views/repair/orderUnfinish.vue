@@ -16,7 +16,7 @@
   </div>
 </template>
 <script>
-import store from '@/store'
+// import store from '@/store'
 import { mapActions } from 'vuex'
 const columns = [
   {
@@ -175,7 +175,7 @@ export default {
     }
   },
   mounted () {
-    const jsonData = { repairUserId: store.getters.userInfo.userId, process: 1 }
+    const jsonData = { process: 1 }
     this.getRepairListApi(jsonData)
       .then(res => this.handleScuccessfully(res))
       .catch(err => { console.log('err:', err) })

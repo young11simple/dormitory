@@ -210,17 +210,13 @@ export default {
           if (customActiveKey === 'tab1') {
             Vue.ls.set(ROLE_ID, 'admin')
             loginParams.auth = 1
-            console.log('管理员上线')
           } else if (customActiveKey === 'tab2') {
             Vue.ls.set(ROLE_ID, 'student')
             loginParams.auth = 2
-            console.log('学生上线')
           } else {
             Vue.ls.set(ROLE_ID, 'others')
             loginParams.auth = 3
           }
-          // loginParams.password = md5(values.password)
-          console.log('login form', loginParams)
           store.commit('SET_PASSWORD', loginParams.password)
           Login(loginParams)
             .then(res => this.loginSuccess(res))
@@ -285,11 +281,11 @@ export default {
     },
     loginSuccess (res) {
       this.$router.push({ path: '/' })
-      // 延迟 1 秒显示欢迎信息
       setTimeout(() => {
         this.$notification.success({
           message: '欢迎',
-          description: `${timeFix()}，欢迎回来`
+          description: `${timeFix()}，欢迎回来`,
+          duration: 2
         })
       }, 1000)
       this.isLoginError = false

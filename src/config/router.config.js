@@ -7,30 +7,8 @@ export const adminRouterMap = [
     name: 'index',
     component: BasicLayout,
     meta: { title: '首页' },
-    redirect: '/management/dormInfo',
+    redirect: '/account/base',
     children: [
-      // studentInfo
-      // {
-      //   path: '/studentInfo',
-      //   name: 'studentInfo',
-      //   redirect: '/studentInfo/search',
-      //   component: RouteView,
-      //   meta: { title: '学生信息', keepAlive: true, icon: 'team' },
-      //   children: [
-      //     {
-      //       path: '/studentInfo/search',
-      //       name: 'search',
-      //       component: () => import('@/views/management/Analysis'),
-      //       meta: { title: '学生信息', keepAlive: false }
-      //     },
-      //     {
-      //       path: '/studentInfo/update',
-      //       name: 'search',
-      //       component: () => import('@/views/management/Analysis'),
-      //       meta: { title: '更新学生信息', keepAlive: false }
-      //     }
-      //   ]
-      // },
       // management
       {
         path: '/management',
@@ -55,7 +33,7 @@ export const adminRouterMap = [
             path: '/management/cancellation',
             name: 'cancellation',
             component: () => import('@/views/management/cancellation'),
-            meta: { title: '注销学生信息', keepAlive: true }
+            meta: { title: '修改学生信息', keepAlive: true }
           }
         ]
       },
@@ -84,6 +62,18 @@ export const adminRouterMap = [
             name: 'check',
             component: () => import('@/views/register/check'),
             meta: { title: '卫生检查', keepAlive: false }
+          },
+          {
+            path: '/registor/checkDorm',
+            name: 'checkDorm',
+            component: () => import('@/views/register/checkDorm'),
+            meta: { title: '查寝登记', keepAlive: false }
+          },
+          {
+            path: '/registor/judgeDorm',
+            name: 'judgeDorm',
+            component: () => import('@/views/register/judgeDorm'),
+            meta: { title: '宿舍评比', keepAlive: false }
           }
         ]
       },
@@ -157,7 +147,7 @@ export const studentRouterMap = [
     name: 'index',
     component: BasicLayout,
     meta: { title: '首页' },
-    redirect: '/pay/payTotal',
+    redirect: '/account/base',
     children: [
       // pay
       {
@@ -347,19 +337,6 @@ export const constantRouterMap = [
         path: 'recover',
         name: 'recover',
         component: undefined
-      }
-    ]
-  },
-
-  {
-    path: '/test',
-    component: BlankLayout,
-    redirect: '/test/home',
-    children: [
-      {
-        path: 'home',
-        name: 'TestHome',
-        component: () => import('@/views/Home')
       }
     ]
   },

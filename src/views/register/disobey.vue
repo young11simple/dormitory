@@ -148,7 +148,7 @@ export default {
       config: {
         rules: [{ type: 'object', required: true, message: '请选择选项!' }]
       },
-      form: this.$form.createForm(this, { name: 'advanced_apply' }),
+      form: this.$form.createForm(this),
       selfInfo: {},
       levelArr: ['', '低', '中', '高']
     }

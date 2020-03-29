@@ -189,3 +189,45 @@ export function logoffStudent (params) {
     data: params
   })
 }
+export function getNights (params) {
+  return axios({
+    url: '/getNights',
+    method: 'post',
+    data: params
+  })
+}
+export function addNight (params) {
+  return axios({
+    url: '/addNight',
+    method: 'post',
+    data: params
+  })
+}
+export function delNight (params) {
+  return axios({
+    url: '/delNight',
+    method: 'post',
+    data: params
+  })
+}
+export function pay (param) {
+  return axios({
+    url: '/pay',
+    method: 'get',
+    params: param
+  })
+}
+export function getPayResult (params) {
+  return axios({
+    url: '/getPayResult',
+    method: 'post',
+    data: params
+  })
+}
+export function resetPw (params) {
+  return axios({
+    url: '/resetPw',
+    method: 'post',
+    data: params
+  })
+}

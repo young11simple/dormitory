@@ -52,19 +52,12 @@ export default {
       const dorms = res.data.dorms
       console.log('dorms', dorms)
       dorms.forEach(ele => {
-        ele.key = this.data.length
         const jsonData2 = { dormId: ele.dormId, days: 1 }
         this.eleSearchApi(jsonData2).then(res => {
           const tmp = res.data.records[0]
           Object.assign(ele, tmp)
+          ele.key = this.data.length
           this.data.push(ele)
-          // tmp.forEach(ele => {
-          //   ele.time = ele.time.slice(5, ele.time.length).replace(/-/, '/')
-          // })
-          // this.getItems = tmp
-          // this.title = this.ammeter[index] + '近' + this.Rvalue + '天的用电情况'
-          // this.hasRecord = true
-          // console.log('this.getItems', this.getItems)
         })
           .catch(err => { console.log('err', err) })
         console.log('this.data', this.data)

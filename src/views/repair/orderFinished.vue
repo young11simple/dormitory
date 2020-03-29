@@ -10,7 +10,7 @@
   </div>
 </template>
 <script>
-import store from '@/store'
+// import store from '@/store'
 import { mapActions } from 'vuex'
 const columns = [
   {
@@ -86,11 +86,11 @@ export default {
     }
   },
   mounted () {
-    const jsonData = { repairUserId: store.getters.userInfo.userId, process: 2 }
+    const jsonData = { process: 2 }
     this.getRepairListApi(jsonData)
       .then(res => this.handleScuccessfully(res))
       .catch(err => { console.log('err:', err) })
-    const jsonData2 = { repairUserId: store.getters.userInfo.userId, process: -1 }
+    const jsonData2 = { process: -1 }
     this.getRepairListApi(jsonData2)
       .then(res => this.handleScuccessfully(res))
       .catch(err => { console.log('err:', err) })

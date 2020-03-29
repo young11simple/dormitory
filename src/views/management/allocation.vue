@@ -164,8 +164,20 @@ export default {
     },
     export2Excel () {
       this.newUsers = []
-      this.innerData.forEach(ele => {
-        this.newUsers = this.newUsers.concat(ele)
+      this.innerData.forEach(ele2 => {
+        ele2.forEach(ele => {
+          this.newUsers.push({
+            宿舍号: ele.roomId,
+            姓名: ele.name,
+            学号: ele.userId,
+            性别: ele.gender,
+            联系方式: ele.telephone,
+            学院: ele.college,
+            专业: ele.major,
+            班级: ele.classId,
+            年级: ele.level
+          })
+        })
       })
       const header = ['宿舍号', '人数', '空铺', '姓名', '学号', '性别', '联系方式', '院系', '专业', '班级', '级别']
       const xlsxName = store.getters.userInfo.area + store.getters.userInfo.buildId + '栋宿舍信息'
@@ -193,7 +205,6 @@ export default {
     },
     handleInnerData (element) {
       this.getUsersByDormApi({ dormId: element.dormId }).then(res => {
-        console.log('getInfo res', res)
         const arr = []
         if (res.data.users.length > 0) {
           res.data.users.forEach(ele => {
@@ -201,8 +212,9 @@ export default {
             arr.push(ele)
           })
         }
-        this.innerData.unshift(arr)
-        console.log('this.innerData', this.innerData)
+        element.key = this.data.length
+        this.data.push(element)
+        this.innerData.push(arr)
       })
         .catch(err => console.log('getInfo err', err))
     }
@@ -211,17 +223,14 @@ export default {
     const jsonData = { area: store.getters.userInfo.area, buildId: store.getters.userInfo.buildId }
     this.getDormsApi(jsonData).then(res => {
       res.data.dorms.forEach(element => {
-        element.key = this.data.length
         if (element.lastbed > 0) {
           element.hasEmpty = '是'
         } else {
           element.hasEmpty = '否'
         }
-        this.data.push(element)
         this.handleInnerData(element)
         this.count += element.lastbed
       })
-      console.log('this.data', this.data)
     })
       .catch(err => console.log('err', err))
   }

@@ -169,6 +169,7 @@ export default {
       }
     },
     handleScuccessfully (res) {
+      console.log(res)
       if (res.data.size > 0) {
         const result = res.data.repairInfo
         result.forEach(element => {
@@ -191,7 +192,7 @@ export default {
     }
   },
   mounted () {
-    const jsonData = { repairUserId: store.getters.userInfo.userId, process: 0 }
+    const jsonData = { process: 0 }
     this.getRepairListApi(jsonData)
       .then(res => this.handleScuccessfully(res))
       .catch(err => { console.log('err:', err) })

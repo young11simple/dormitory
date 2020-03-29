@@ -20,8 +20,8 @@
         <a-input-password v-model="newPasswordAgain" />
       </span>
       <a-alert
-        message="Error"
-        description="前后密码不一致"
+        style="marginTop:10px"
+        message="前后密码不一致"
         type="error"
         showIcon
         v-if="isSame"
@@ -70,10 +70,6 @@ export default {
       }
     },
     saveSuccessfully (res) {
-      console.log('save successfully', res)
-      // this.newPassword = ''
-      // this.newPasswordAgain = ''
-      // this.isModified = false
       this.$notification['success']({
         message: '成功',
         description: '密码修改成功,请重新登陆',
